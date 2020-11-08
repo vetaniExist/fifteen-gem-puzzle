@@ -1,8 +1,16 @@
+function configurateButton(newInnnerText) {
+  const newButton = document.createElement("button");
+  newButton.classList.add("basic_button");
+  newButton.innerText = newInnnerText;
+  return newButton;
+}
+
 const wrapper = document.createElement("div");
 const canvas = document.createElement("canvas");
 const controlButtonsDiv = document.createElement("div");
 
 const buttonStart = configurateButton("start");
+const buttonBestScore = configurateButton("best score");
 
 function configurateLayout() {
   wrapper.classList.add("wrapper");
@@ -12,6 +20,7 @@ function configurateLayout() {
   // button_start.setAttribute("hidden", true);
 
   controlButtonsDiv.appendChild(buttonStart);
+  controlButtonsDiv.appendChild(buttonBestScore);
 
   wrapper.appendChild(canvas);
   wrapper.appendChild(controlButtonsDiv);
@@ -19,13 +28,7 @@ function configurateLayout() {
   document.body.appendChild(wrapper);
 }
 
-function configurateButton(newInnnerText) {
-  const newButton = document.createElement("button");
-  newButton.classList.add("basic_button");
-  newButton.innerText = newInnnerText;
-  return newButton;
-}
-
 module.exports = {
   configurateLayout,
+  canvas,
 };

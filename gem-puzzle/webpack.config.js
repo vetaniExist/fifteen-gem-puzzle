@@ -36,10 +36,14 @@ module.exports = (env, options) => {
                     ]
                 },
                 {
-                    test: /\.(png|jpe?g|gif|svg)$/i,
+                    test: /\.(png|jpe?g|gif|svg|jpg)$/,
                     use: [
                         {
                             loader: 'file-loader',
+                            options: {
+                                publicPath: 'assets/images',
+                                outputPath: 'assets/images',
+                            },
                         },
                     ],
                 },
