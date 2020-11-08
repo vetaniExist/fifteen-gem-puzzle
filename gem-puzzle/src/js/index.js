@@ -1,10 +1,10 @@
 // import '../css/style.css';
 // import '../css/style.scss';
 import {
-  moduleOne,
-} from "./moduleOne";
+  configurateLayout,
+} from "./configurateLayout";
 
-const helloArr = require("./moduleOne.js");
+/* const helloArr = require("./moduleOne.js");
 
 class TestClass {
   constructor() {
@@ -12,18 +12,17 @@ class TestClass {
     console.log(msg);
   }
 }
-
 const test = new TestClass();
-
 
 // Пример массива
 console.log(helloArr);
+/* пример подключения модуля */
+// let mod = moduleOne(2, 3);
+// console.log(mod);
 
-/* пример подключения модуля*/
-let mod = moduleOne(2, 3);
-
-console.log(mod);
+const layout = configurateLayout();
 
 window.addEventListener("load", () => {
   console.log("hello webpack");
+  layout;
 });
