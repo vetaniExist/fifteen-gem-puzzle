@@ -1,5 +1,5 @@
 body{
-    background: url(../assets/images/08.jpg);
+    background: url(../assets/images/08.jpg) center center / cover no-repeat, linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
 }
 
 .wrapper{
@@ -24,7 +24,6 @@ body{
 }
 
 #puzzle_canvas{
-    background: green;
     height: 480px;
     width: 480px;
 }

@@ -1,7 +1,13 @@
-class GamePuzzle {
-  constructor(canvasObj) {
+import {
+  MyCanvas,
+} from "./canvas";
+
+export class GamePuzzle {
+  constructor(canvas) {
     this.startArray = [];
-    this.canvasObj = canvasObj;
+    this.canvasObj = new MyCanvas(canvas);
+    this.stepCounter = 0;
+    this.today = null;
   }
 
   setStartArray(newStartArray) {
@@ -14,7 +20,9 @@ class GamePuzzle {
 
   start() {
     console.log(this.canvasObj);
+    
     this.canvasObj.initBasicField(this.startArray, 4);
+    this.today = new Date();
 
     this.canvasObj.canvas.addEventListener("click", (event) => {
       console.log("it was click");
@@ -32,9 +40,29 @@ class GamePuzzle {
       console.log(this.canvasObj.checkBottom(currentBlockClick));
       console.log(currentBlockClick);
 
-      this.canvasObj.trySwap(currentBlockClick);
+      if (this.canvasObj.trySwap(currentBlockClick)) {
+        this.stepCounter += 1;
+        console.log("Step is correct. Count of steps = " + this.stepCounter);
+        if(this.canvasObj.checkWinCondition()) {
+          this.canvasObj.addWinText(this.stepCounter, this.checkTime());
+        } 
+      }
     });
   }
+
+  checkTime() {
+    const newDate = new Date();
+
+    const itTookHours = newDate.getHours() - this.today.getHours();
+    const itTookMinutes = newDate.getMinutes() - this.today.getMinutes();
+    const itTookSec = newDate.getSeconds() - this.today.getSeconds();
+
+    return "it took: minutes: ".concat(GamePuzzle.formatTime(itTookMinutes)).concat(" seconds: ").concat(GamePuzzle.formatTime(itTookSec));
+  }
+
+  static formatTime(num){
+    return ( parseInt(num) < 10 ? "0" : "") + num;
+}
 
   static getBucketValue(x) {
     if (x < 120) {
@@ -71,8 +99,7 @@ class GamePuzzle {
       }
     }
   }
+  
 }
 
-module.exports = {
-  GamePuzzle,
-};
+export default GamePuzzle;

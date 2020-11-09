@@ -1,8 +1,9 @@
-class MyCanvas {
+export class MyCanvas {
   constructor(canvas) {
     this.canvas = canvas;
     this.styles = ["greenyellow", "yellow", "red", "purple"];
     this.textDraw = [];
+    this.winConditionArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, ""];
   }
 
   static getRandomInt(newMax) {
@@ -17,8 +18,6 @@ class MyCanvas {
     const context = this.canvas.getContext("2d");
     context.font = "22px Verdana";
 
-    console.log(this.canvas.height);
-    console.log(context.font);
     for (let i = 0; i < size; i += 1) {
       for (let j = 0; j < size; j += 1) {
         console.log(valueArray[i * 4 + j]);
@@ -33,19 +32,58 @@ class MyCanvas {
     }
   }
 
+  addWinText(step, time){
+    const context = this.canvas.getContext("2d");
+    context.font = "30px Verdana";
+    context.clearRect(0, 0, 480, 480);
+    context.fillStyle = "rgba(0,0,0,0)";
+    context.fillRect(0, 0, 480, 480);
+    context.fillStyle = "white";
+    context.fillText("You win!!! Step Count:".concat(step), 0, 120);
+    context.font = "24px Verdana";
+    context.fillText(time, 0, 250);
+  }
+
+  checkWinCondition(){
+    console.log("winCondArray = " + this.winConditionArray);
+    console.log("textDraw = " + this.textDraw);
+    if (this.winConditionArray === this.textDraw) {
+      return true;
+    }
+    if (this.winConditionArray == null || this.textDraw == null) {
+      return false;
+    }
+    if (this.winConditionArray.length !== this.textDraw.length) {
+      return false;
+    }
+
+    for (let i = 0; i < this.winConditionArray.length; ++i) {
+      if (this.winConditionArray[i] !== this.textDraw[i]) {
+        return false;
+      } 
+    }
+
+    return true;
+  }
+
   trySwap(currentCol) {
     if (this.checkLeft(currentCol)) {
       this.swap(currentCol, -120, 0, -1);
+      return true;
 
     } else if (this.checkTop(currentCol)) {
       this.swap(currentCol, 0, -120, -4);
+      return true;
 
     } else if (this.checkRight(currentCol)) {
       this.swap(currentCol, 120, 0, 1);
+      return true;
 
     } else if (this.checkBottom(currentCol)){
       this.swap(currentCol, 0, 120, 4);
+      return true;
     }
+    return false;
   }
 
   swap(currentCol, stepX, stepY, stepInArray) {
@@ -124,7 +162,3 @@ class MyCanvas {
     return false;
   }
 }
-
-module.exports = {
-  MyCanvas,
-};
