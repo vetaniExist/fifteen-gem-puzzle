@@ -20,7 +20,7 @@ export class GamePuzzle {
     this.startArray = [];
     switch(this.size) {
       case 4: {
-        fieldOfCellValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, "", 15];
+        fieldOfCellValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
         console.log("configurate basic field");
         break;
       }
@@ -35,11 +35,35 @@ export class GamePuzzle {
       }
     }
 
-    for(let i = 0; i < this.size * this.size; i += 1) {
+    for(let i = 0; i < this.size * this.size - 1; i += 1) {
       let randCeil = getRandomInt(fieldOfCellValues.length);
       this.startArray.push(fieldOfCellValues[randCeil]);
       fieldOfCellValues.splice(randCeil,1)
     }
+    if (this.isSolved(this.startArray)) {
+      this.startArray.push("");
+    } else {
+      console.log("restart");
+      this.configurateStartField();
+      
+    }
+      
+  }
+
+  isSolved(field) {
+    console.log("isSolved");
+    let inversesCounter = 0;
+    for (let i = 1; i < this.size * this.size - 1; i += 1) {
+      for (let j = 0; j < i; j += 1) {
+        if (field[i] < field[j]) {
+          inversesCounter += 1;
+        }
+      }
+     
+    }
+    console.log("inversesCounter " + inversesCounter);
+    console.log("inversesCounter % 2 === 0" + inversesCounter % 2 === 0)
+    return inversesCounter % 2 === 0 ? true : false;
   }
 
   start() {
