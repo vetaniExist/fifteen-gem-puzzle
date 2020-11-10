@@ -2,24 +2,50 @@ import {
   MyCanvas,
 } from "./canvas";
 
+import {
+  getRandomInt,
+} from "./utils";
+
 export class GamePuzzle {
   constructor(canvas) {
     this.startArray = [];
     this.canvasObj = new MyCanvas(canvas);
     this.stepCounter = 0;
     this.today = null;
+    this.size = 4;
   }
 
-  setStartArray(newStartArray) {
-    this.startArray = newStartArray;
-  }
+  configurateStartField() {
+    let fieldOfCellValues = [];
+    this.startArray = [];
+    switch(this.size) {
+      case 4: {
+        fieldOfCellValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, "", 15];
+        console.log("configurate basic field");
+        break;
+      }
+      case 3: {
+        
+      }
+      case 8: {
 
-  getStartArray() {
-    return this.startArray;
+      }
+      default: {
+        throw new Error("configurateStartField func err. This field size not implimented");
+      }
+    }
+
+    for(let i = 0; i < this.size * this.size; i += 1) {
+      let randCeil = getRandomInt(fieldOfCellValues.length);
+      this.startArray.push(fieldOfCellValues[randCeil]);
+      fieldOfCellValues.splice(randCeil,1)
+    }
   }
 
   start() {
     console.log(this.canvasObj);
+
+    this.configurateStartField();
     
     this.canvasObj.initBasicField(this.startArray, 4);
     this.today = new Date();
