@@ -4,7 +4,14 @@ import {
 
 import {
   getRandomInt,
+  formatTime,
 } from "./utils";
+
+import {
+  updateTimeEl,
+  getTimeInnerText,
+} from "./configurateLayout";
+
 
 export class GamePuzzle {
   constructor(canvas) {
@@ -73,6 +80,8 @@ export class GamePuzzle {
     
     this.canvasObj.initBasicField(this.startArray, 4);
     this.today = new Date();
+    this.stepCounter = 0;
+    this.startTimer();
 
     this.canvasObj.canvas.addEventListener("click", (event) => {
       console.log("it was click");
@@ -92,6 +101,7 @@ export class GamePuzzle {
 
       if (this.canvasObj.trySwap(currentBlockClick)) {
         this.stepCounter += 1;
+        this.updateTime()
         console.log("Step is correct. Count of steps = " + this.stepCounter);
         if(this.canvasObj.checkWinCondition()) {
           this.canvasObj.addWinText(this.stepCounter, this.checkTime());
@@ -100,19 +110,42 @@ export class GamePuzzle {
     });
   }
 
+  updateTime(minutes, sec) {
+    if (minutes === undefined || sec === undefined) {
+      const timeElInner = getTimeInnerText();
+      updateTimeEl(timeElInner.slice(0, timeElInner.length - this.stepCounter.toString(10).length).concat(this.stepCounter))
+    } else {
+      updateTimeEl(formatTime(minutes).concat(" : ").concat(formatTime(sec)).concat(" step: ").concat(this.stepCounter));
+    }
+  }
+
+   startTimer() {
+    const newDate = new Date();
+
+    const itTookHours = newDate.getHours() - this.today.getHours();
+    const itTookMinutes = newDate.getMinutes() - this.today.getMinutes() + itTookHours * 60;
+    let itTookSec;
+    if (itTookMinutes) {
+      itTookSec = newDate.getSeconds();
+    } else {
+      itTookSec = newDate.getSeconds() - this.today.getSeconds();
+    }
+    this.updateTime(itTookMinutes, itTookSec);
+
+    setTimeout(this.startTimer.bind(this), 1000);
+  }
+
   checkTime() {
     const newDate = new Date();
 
     const itTookHours = newDate.getHours() - this.today.getHours();
-    const itTookMinutes = newDate.getMinutes() - this.today.getMinutes();
-    const itTookSec = newDate.getSeconds() - this.today.getSeconds();
+    const itTookMinutes = newDate.getMinutes() - this.today.getMinutes() + itTookHours * 60;
+    const itTookSec =  itTookMinutes ? newDate.getSeconds() - this.today.getSeconds() : newDate.getSeconds();
 
-    return "it took: minutes: ".concat(GamePuzzle.formatTime(itTookMinutes)).concat(" seconds: ").concat(GamePuzzle.formatTime(itTookSec));
+    return "it took: minutes: ".concat(formatTime(itTookMinutes)).concat(" seconds: ").concat(formatTime(itTookSec));
   }
 
-  static formatTime(num){
-    return ( parseInt(num) < 10 ? "0" : "") + num;
-}
+  
 
   static getBucketValue(x) {
     if (x < 120) {

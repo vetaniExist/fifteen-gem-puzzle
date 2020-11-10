@@ -15,6 +15,7 @@ function configurateButton(newInnnerText) {
 
 const wrapper = createEl("div");
 const canvasDiv = createEl("div");
+const time = createEl("time");
 const canvas = createEl("canvas");
 const controlButtonsDiv = createEl("div");
 
@@ -24,6 +25,8 @@ const buttonBestScore = configurateButton("best score");
 function configurateLayout() {
   wrapper.classList.add("wrapper");
   canvas.setAttribute("id", "puzzle_canvas");
+  canvasDiv.classList.add("canvas_div")
+  time.classList.add("time");
 
   controlButtonsDiv.classList.add("control_buttons_div");
   // button_start.setAttribute("hidden", true);
@@ -31,6 +34,7 @@ function configurateLayout() {
   controlButtonsDiv.appendChild(buttonStart);
   controlButtonsDiv.appendChild(buttonBestScore);
 
+  canvasDiv.appendChild(time)
   canvasDiv.appendChild(canvas);
 
   wrapper.appendChild(canvasDiv);
@@ -39,8 +43,18 @@ function configurateLayout() {
   document.body.appendChild(wrapper);
 }
 
+function updateTimeEl(newTimeContent) {
+  time.innerText = newTimeContent;
+}
+
+function getTimeInnerText(){
+  return time.innerText;
+}
+
 module.exports = {
   configurateLayout,
   canvas,
   buttonStart,
+  updateTimeEl,
+  getTimeInnerText,
 };

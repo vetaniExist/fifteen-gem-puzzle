@@ -23,6 +23,19 @@ body{
     justify-content: center;
 }
 
+
+.canvas_div{
+  max-width: 480px;
+  display: flex;
+  flex-wrap: wrap-reverse;
+}
+
+.time{
+  color: wheat;
+
+  font-size: 1.75rem;
+}
+
 #puzzle_canvas{
     height: 480px;
     width: 480px;
