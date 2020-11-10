@@ -36,13 +36,13 @@ module.exports = (env, options) => {
                     ]
                 },
                 {
-                    test: /\.(png|jpe?g|gif|svg|jpg)$/,
+                    test: /\.(png|jpe?g|gif|svg|jpg|wav)$/,
                     use: [
                         {
                             loader: 'file-loader',
                             options: {
-                                publicPath: 'assets/images',
-                                outputPath: 'assets/images',
+                                publicPath: 'assets/',
+                                outputPath: './assets/',
                             },
                         },
                     ],
@@ -57,7 +57,8 @@ module.exports = (env, options) => {
         plugins:[
             new CleanWebpackPlugin(),
             new HtmlWebpackPlugin({
-                template: 'src/index.html'
+                template: 'src/index.html',
+                favicon: 'src/assets/favicon.svg',
             }),
             new MiniCssExtractPlugin({
                 filename: 'style.css',

@@ -20,6 +20,13 @@ export class GamePuzzle {
     this.stepCounter = 0;
     this.today = null;
     this.size = 4;
+    this.audio = [];
+  }
+
+  initAudio(){
+    let audio_swipe = document.createElement("audio");
+    audio_swipe.setAttribute("src", "/src/assets/sounds/tink.wav");
+    this.audio["swipe"] = audio_swipe;
   }
 
   configurateStartField() {
@@ -76,6 +83,7 @@ export class GamePuzzle {
   start() {
     console.log(this.canvasObj);
 
+    this.initAudio();
     this.configurateStartField();
     
     this.canvasObj.initBasicField(this.startArray, 4);
@@ -100,6 +108,7 @@ export class GamePuzzle {
       console.log(currentBlockClick);
 
       if (this.canvasObj.trySwap(currentBlockClick)) {
+        this.audio["swipe"].play();
         this.stepCounter += 1;
         this.updateTime()
         console.log("Step is correct. Count of steps = " + this.stepCounter);
