@@ -21,6 +21,13 @@ export class GamePuzzle {
     this.today = null;
     this.size = 4;
     this.audio = [];
+    this.mouse = {
+      x: 0,
+      y: 0,
+      isDown: false,
+      moveX: 0,
+      moveY:0,
+    };
   }
 
   initAudio(){
@@ -91,16 +98,43 @@ export class GamePuzzle {
     this.stepCounter = 0;
     this.startTimer();
 
+    this.canvasObj.canvas.addEventListener("mousedown", (event) =>{
+      const rect = this.canvasObj.canvas.getBoundingClientRect();
+      this.mouse.x = event.clientX - rect.left;
+      this.mouse.y = event.clientY - rect.top;
+      this.mouse.isDown = true;
+
+      this.mouse.moveX = this.mouse.x;
+      this.mouse.moveY = this.mouse.y;
+    });
+
+    this.canvasObj.canvas.addEventListener("mouseup", () =>{
+      this.mouse.isDown = false;
+      if ( this.mouse.moveX !== this.mouse.x || this.mouse.moveY !== this.mouse.y) {
+        console.log("move Coordinate x: ".concat(this.mouse.moveX));
+        console.log("move Coordinate y: ".concat(this.mouse.moveY));
+      }
+      
+    });
+
+    this.canvasObj.canvas.addEventListener("mousemove", (event) =>{
+      if (this.mouse.isDown) {
+        const rect = this.canvasObj.canvas.getBoundingClientRect();
+        const currentBlockClick = GamePuzzle.getBucketY(this.mouse.moveX) + GamePuzzle.getBucketValue(this.mouse.moveY);
+
+        this.canvasObj.isCursorInCell(this.mouse.moveX,this.mouse.moveY, currentBlockClick);
+        this.mouse.moveX = event.clientX - rect.left;
+        this.mouse.moveY = event.clientY - rect.top;
+        console.log("move");
+      }
+    });
+
     this.canvasObj.canvas.addEventListener("click", (event) => {
       console.log("it was click");
-      const rect = this.canvasObj.canvas.getBoundingClientRect();
+      const currentBlockClick = GamePuzzle.getBucketY(this.mouse.y ) + GamePuzzle.getBucketValue(this.mouse.x);
 
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      const currentBlockClick = GamePuzzle.getBucketY(y) + GamePuzzle.getBucketValue(x);
-
-      console.log("Coordinate x: ".concat(x));
-      console.log("Coordinate y: ".concat(y));
+      console.log("Coordinate x: ".concat(this.mouse.x));
+      console.log("Coordinate y: ".concat(this.mouse.y));
       console.log(this.canvasObj.checkLeft(currentBlockClick));
       console.log(this.canvasObj.checkTop(currentBlockClick));
       console.log(this.canvasObj.checkRight(currentBlockClick));
