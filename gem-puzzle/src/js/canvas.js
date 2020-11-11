@@ -13,7 +13,7 @@ export class MyCanvas {
 
   initBasicField(valueArray = this.textDraw, size = 4) {
     this.textDraw = valueArray;
-    console.log(this.textDraw);
+    // console.log(this.textDraw);
     this.canvas.height = 480;
     this.canvas.width = 480;
     const context = this.canvas.getContext("2d");
@@ -41,21 +41,29 @@ export class MyCanvas {
     }
   }
 
-  redrawCanvas(){
+  redrawCanvas(managedObject = null){
     const context = this.canvas.getContext("2d");
     context.clearRect(0, 0, 480, 480);
     for (let i = 0; i < 4; i += 1) {
       for (let j = 0; j < 4; j += 1) {
         const rectObj = this.getRectObj(i + j * 4);
+        if (managedObject !== null && managedObject === rectObj) {
+          continue;
+        }
         this.drawRect(rectObj);
         this.strokeRect(rectObj);
         this.fillTextInRect(rectObj);
       }
     }
+    if (managedObject !== null) {
+      this.drawRect(managedObject);
+      this.strokeRect(managedObject);
+      this.fillTextInRect(managedObject);
+    }
   }
 
   drawRect(rectObj){
-    console.log(rectObj);
+    // console.log(rectObj);
     const context = this.canvas.getContext("2d");
     context.fillStyle = rectObj.color;
     context.clearRect(rectObj.x, rectObj.y, rectObj.w, rectObj.h);
@@ -138,8 +146,8 @@ export class MyCanvas {
 
   swapObject(currentCol,stepInArray) {
     // swap in array
-    console.log("get cur col = " + currentCol);
-    console.log(this.rectObjects[currentCol]);
+    // console.log("get cur col = " + currentCol);
+    // console.log(this.rectObjects[currentCol]);
 
    
     
@@ -157,11 +165,11 @@ export class MyCanvas {
     this.textDraw[currentCol] = this.textDraw[currentCol + stepInArray];
     this.textDraw[currentCol + stepInArray] = tmpVal;
 
-    console.log("rectObjCur");
-    console.log(rectObjCur);
+    // console.log("rectObjCur");
+    // console.log(rectObjCur);
 
-    console.log("rectObjPrev");
-    console.log(rectObjPrev);
+    // console.log("rectObjPrev");
+    // console.log(rectObjPrev);
 
 
     this.drawRect(rectObjCur);

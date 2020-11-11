@@ -29,6 +29,8 @@ export class GamePuzzle {
       isDown: false,
       moveX: 0,
       moveY:0,
+      currCell: null,
+      isClickAviable: true,
     };
     this.mouseHandlerUp = null;
     this.mouseHandlerMove = null;
@@ -114,6 +116,7 @@ export class GamePuzzle {
       moveX: 0,
       moveY:0,
       currCell: null,
+      isClickAviable: true,
     };
     this.mouseHandlerUp = null;
     this.mouseHandlerMove = null;
@@ -137,7 +140,6 @@ export class GamePuzzle {
 
     this.canvasObj.canvas.addEventListener("mousedown", (event) =>{
       // запомнили координаты при нажатии, установили mouseMove в эту же позицию
-      // const rect = this.canvasObj.canvas.getBoundingClientRect();
       console.log("this.mouse");
       console.log(this.mouse);
       this.mouse.x = event.clientX - this.canvasRect.left;
@@ -158,24 +160,19 @@ export class GamePuzzle {
     });
 
     this.canvasObj.canvas.addEventListener("click", (event) => {
-      const currentBlockClick = GamePuzzle.getBucketY(this.mouse.y ) + GamePuzzle.getBucketValue(this.mouse.x);
-
-      console.log("Coordinate x: ".concat(this.mouse.x));
-      console.log("Coordinate y: ".concat(this.mouse.y));
-      console.log(this.canvasObj.checkLeft(currentBlockClick));
-      console.log(this.canvasObj.checkTop(currentBlockClick));
-      console.log(this.canvasObj.checkRight(currentBlockClick));
-      console.log(this.canvasObj.checkBottom(currentBlockClick));
-      console.log(currentBlockClick);
-
-      if (this.canvasObj.trySwap(currentBlockClick)) {
-        this.audio["swipe"].play();
-        this.stepCounter += 1;
-        this.updateTime()
-        console.log("Step is correct. Count of steps = " + this.stepCounter);
-        if(this.canvasObj.checkWinCondition()) {
-          this.canvasObj.addWinText(this.stepCounter, this.checkTime());
-        } 
+      if (this.mouse.isClickAviable) {
+        const currentBlockClick = GamePuzzle.getBucketY(this.mouse.y ) + GamePuzzle.getBucketValue(this.mouse.x);
+        if (this.canvasObj.trySwap(currentBlockClick)) {
+          this.audio["swipe"].play();
+          this.stepCounter += 1;
+          this.updateTime()
+          console.log("Step is correct. Count of steps = " + this.stepCounter);
+          if(this.canvasObj.checkWinCondition()) {
+            this.canvasObj.addWinText(this.stepCounter, this.checkTime());
+          } 
+        }
+      } else {
+        this.mouse.isClickAviable = true;
       }
     });
   }
@@ -189,27 +186,59 @@ export class GamePuzzle {
     console.log(this.mouse);
     if (this.mouse.isDown) {
       const rect = this.canvasObj.canvas.getBoundingClientRect();
-      // const currentBlockClick = GamePuzzle.getBucketY(this.mouse.x) + GamePuzzle.getBucketValue(this.mouse.y);
 
-      // this.canvasObj.isCursorInCell(this.mouse.moveX,this.mouse.moveY, currentBlockClick);
       this.mouse.moveX = event.clientX - rect.left;
       this.mouse.moveY = event.clientY - rect.top;
 
-      this.currCell.x = this.mouse.moveX;
-      this.currCell.y = this.mouse.moveY;
+      if (Math.abs(this.mouse.moveX - this.mouse.x) > 25 || Math.abs(this.mouse.moveY - this.mouse.y) > 25) {
+        this.mouse.isClickAviable = false;
+        console.log("Math.abs(this.mouse.moveX - this.mouse.x)");
+        console.log(Math.abs(this.mouse.moveX - this.mouse.x));
 
-      console.log("find cell");
-      console.log(this.currCell);
-      this.canvasObj.redrawCanvas();
+        console.log("Math.abs(this.mouse.moveY - this.mouse.y)");
+        console.log(Math.abs(this.mouse.moveY - this.mouse.y));
 
-      console.log("move");
+        this.currCell.x = this.mouse.moveX;
+        this.currCell.y = this.mouse.moveY;
+  
+        console.log("find cell");
+        console.log(this.currCell);
+        this.canvasObj.redrawCanvas(this.currCell);
+  
+        console.log("move");
+      }
     }
   }
 
   onMouseUp(event = null){
     this.mouse.isDown = false;
 
-    this.currCell.x 
+    const thisWasCell   = GamePuzzle.getBucketY(this.mouse.y) + GamePuzzle.getBucketValue(this.mouse.x);
+    const cellWeleftOff = GamePuzzle.getBucketY(this.mouse.moveY) + GamePuzzle.getBucketValue(this.mouse.moveX);
+
+    const leftCondition   = this.canvasObj.checkLeft(thisWasCell) && thisWasCell - cellWeleftOff   === 1;
+    const topCondition    = this.canvasObj.checkTop(thisWasCell) && thisWasCell - cellWeleftOff    === 4;
+    const rightCondition  = this.canvasObj.checkRight(thisWasCell) && thisWasCell - cellWeleftOff  === -1;
+    const bottomCondition = this.canvasObj.checkBottom(thisWasCell) && thisWasCell - cellWeleftOff === -4;
+
+    console.log("leftCondition " + leftCondition);
+    console.log("topCondition " + topCondition);
+    console.log("rightCondition " + rightCondition);
+    console.log("bottomCondition " + bottomCondition);
+
+    if (leftCondition) {
+      this.canvasObj.swapObject(thisWasCell, -1);
+    } else if (topCondition) {
+      this.canvasObj.swapObject(thisWasCell,-4);
+    } else if (rightCondition) {
+      this.canvasObj.swapObject(thisWasCell, 1);
+    } else if (bottomCondition) {
+      this.canvasObj.swapObject(thisWasCell, 4);
+    }
+
+    this.currCell.x = (thisWasCell % 4) * 120;
+    this.currCell.y = Math.floor(thisWasCell / 4) * 120;
+    this.canvasObj.redrawCanvas();
 
     document.getElementById('puzzle_canvas').removeEventListener("mouseup", this.mouseHandlerUp);
     document.getElementById('puzzle_canvas').removeEventListener("mousemove", this.mouseHandlerMove);
