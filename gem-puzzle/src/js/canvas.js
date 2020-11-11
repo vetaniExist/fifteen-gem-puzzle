@@ -11,7 +11,7 @@ export class MyCanvas {
     return Math.floor(Math.random() * Math.floor(newMax));
   }
 
-  initBasicField(valueArray, size) {
+  initBasicField(valueArray = this.textDraw, size = 4) {
     this.textDraw = valueArray;
     console.log(this.textDraw);
     this.canvas.height = 480;
@@ -23,17 +23,30 @@ export class MyCanvas {
       for (let j = 0; j < size; j += 1) {
         console.log(valueArray[i * 4 + j]);
         let rectObj = {
-          num: i + j*4,
-          x: i,
-          y: j,
+          num: i + j * 4,
+          x: i * 120,
+          y: j * 120,
           w: 120,
           h: 120,
           color: this.styles[MyCanvas.getRandomInt(4)],
           text: valueArray[i + j * 4],
         }
 
-        this.rectObjects.push(rectObj);
+        this.rectObjects[i + j * 4] = (rectObj);
 
+        this.drawRect(rectObj);
+        this.strokeRect(rectObj);
+        this.fillTextInRect(rectObj);
+      }
+    }
+  }
+
+  redrawCanvas(){
+    const context = this.canvas.getContext("2d");
+    context.clearRect(0, 0, 480, 480);
+    for (let i = 0; i < 4; i += 1) {
+      for (let j = 0; j < 4; j += 1) {
+        const rectObj = this.getRectObj(i + j * 4);
         this.drawRect(rectObj);
         this.strokeRect(rectObj);
         this.fillTextInRect(rectObj);
@@ -45,21 +58,21 @@ export class MyCanvas {
     console.log(rectObj);
     const context = this.canvas.getContext("2d");
     context.fillStyle = rectObj.color;
-    context.clearRect(rectObj.x * rectObj.w, rectObj.y * rectObj.h, rectObj.w, rectObj.h);
-    context.fillRect(rectObj.x * rectObj.w, rectObj.y * rectObj.h, rectObj.w, rectObj.h);
+    context.clearRect(rectObj.x, rectObj.y, rectObj.w, rectObj.h);
+    context.fillRect(rectObj.x, rectObj.y, rectObj.w, rectObj.h);
     
     // context.strokeRect(rectObj.x * rectObj.w, rectObj.y * rectObj.h, rectObj.w, rectObj.h);
   }
 
   strokeRect(rectObj){
     const context = this.canvas.getContext("2d");
-    context.strokeRect(rectObj.x * rectObj.w, rectObj.y * rectObj.h, rectObj.w, rectObj.h);
+    context.strokeRect(rectObj.x, rectObj.y, rectObj.w, rectObj.h);
   }
 
   fillTextInRect(rectObj) {
     const context = this.canvas.getContext("2d");
     context.fillStyle = "#000";
-    context.fillText(rectObj.text, 120 * rectObj.x + 60, 60 + 120 * rectObj.y);
+    context.fillText(rectObj.text,rectObj.x + 60, 60 + rectObj.y);
   }
 
   addWinText(step, time){
@@ -120,7 +133,7 @@ export class MyCanvas {
   }
 
   getRectObj(currentCol) {
-    return this.rectObjects.filter( obj => obj.x + obj.y * 4 === currentCol)[0];
+    return this.rectObjects.filter( obj => obj.num === currentCol)[0];
   }
 
   swapObject(currentCol,stepInArray) {
@@ -214,17 +227,9 @@ export class MyCanvas {
     const isOnYLine = y >= minY && y <= minY + 120;
 
     if (isOnXLine && isOnYLine) {
-      this.selectCell(curX, curY);
       return true;
     }
     return false;
-  }
-
-  selectCell(x,y){
-    const context = this.canvas.getContext("2d");
-    context.fillStyle = 'orange';
-    console.log("select");
-    context.strokeRect(x * 120, y * 120, 122, 122);
   }
   
   checkLeft(currentCol) {

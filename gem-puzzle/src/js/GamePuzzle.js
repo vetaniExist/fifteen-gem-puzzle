@@ -16,7 +16,9 @@ import {
 export class GamePuzzle {
   constructor(canvas) {
     this.startArray = [];
-    this.canvasObj = new MyCanvas(canvas);
+    this.canvas = canvas;
+    this.canvasObj = new MyCanvas(this.canvas);
+    this.canvasRect = null;
     this.stepCounter = 0;
     this.today = null;
     this.size = 4;
@@ -28,6 +30,8 @@ export class GamePuzzle {
       moveX: 0,
       moveY:0,
     };
+    this.mouseHandlerUp = null;
+    this.mouseHandlerMove = null;
   }
 
   initAudio(){
@@ -72,7 +76,7 @@ export class GamePuzzle {
   }
 
   isSolved(field) {
-    console.log("isSolved");
+    // console.log("isSolved");
     let inversesCounter = 0;
     for (let i = 1; i < this.size * this.size - 1; i += 1) {
       for (let j = 0; j < i; j += 1) {
@@ -82,55 +86,78 @@ export class GamePuzzle {
       }
      
     }
-    console.log("inversesCounter " + inversesCounter);
-    console.log("inversesCounter % 2 === 0" + inversesCounter % 2 === 0)
+    // console.log("inversesCounter " + inversesCounter);
+    // console.log("inversesCounter % 2 === 0" + inversesCounter % 2 === 0)
     return inversesCounter % 2 === 0 ? true : false;
   }
 
+  getReplacedCanvas() {
+    let el = document.getElementById('puzzle_canvas'),
+    elClone = el.cloneNode(true);
+    el.parentNode.replaceChild(elClone, el);
+    return elClone;
+  }
+
+  restart(){ 
+    this.startArray = [];
+    this.canvas = this.getReplacedCanvas();
+    this.canvasObj = new MyCanvas(this.canvas);
+    this.canvasRect = null;
+    this.stepCounter = 0;
+    this.today = null;
+    this.size = 4;
+    this.audio = [];
+    this.mouse = {
+      x: 0,
+      y: 0,
+      isDown: false,
+      moveX: 0,
+      moveY:0,
+      currCell: null,
+    };
+    this.mouseHandlerUp = null;
+    this.mouseHandlerMove = null;
+    console.log("restartewd");
+    console.log(this);
+  }
+
   start() {
-    console.log(this.canvasObj);
+    if (this.canvasRect !== null) {
+      this.restart();
+    }
 
     this.initAudio();
     this.configurateStartField();
     
     this.canvasObj.initBasicField(this.startArray, 4);
+    this.getCanvasRect();
     this.today = new Date();
     this.stepCounter = 0;
     this.startTimer();
 
     this.canvasObj.canvas.addEventListener("mousedown", (event) =>{
-      const rect = this.canvasObj.canvas.getBoundingClientRect();
-      this.mouse.x = event.clientX - rect.left;
-      this.mouse.y = event.clientY - rect.top;
-      this.mouse.isDown = true;
+      // запомнили координаты при нажатии, установили mouseMove в эту же позицию
+      // const rect = this.canvasObj.canvas.getBoundingClientRect();
+      console.log("this.mouse");
+      console.log(this.mouse);
+      this.mouse.x = event.clientX - this.canvasRect.left;
+      this.mouse.y = event.clientY - this.canvasRect.top;
 
       this.mouse.moveX = this.mouse.x;
       this.mouse.moveY = this.mouse.y;
-    });
 
-    this.canvasObj.canvas.addEventListener("mouseup", () =>{
-      this.mouse.isDown = false;
-      if ( this.mouse.moveX !== this.mouse.x || this.mouse.moveY !== this.mouse.y) {
-        console.log("move Coordinate x: ".concat(this.mouse.moveX));
-        console.log("move Coordinate y: ".concat(this.mouse.moveY));
-      }
+      this.currCell = this.canvasObj.getRectObj(GamePuzzle.getBucketY(this.mouse.y ) + GamePuzzle.getBucketValue(this.mouse.x));
+
+      this.mouse.isDown = true;
       
-    });
+      this.mouseHandlerUp =  this.onMouseUp.bind(this);
+      this.mouseHandlerMove = this.onMouseMove.bind(this);
 
-    this.canvasObj.canvas.addEventListener("mousemove", (event) =>{
-      if (this.mouse.isDown) {
-        const rect = this.canvasObj.canvas.getBoundingClientRect();
-        const currentBlockClick = GamePuzzle.getBucketY(this.mouse.moveX) + GamePuzzle.getBucketValue(this.mouse.moveY);
-
-        this.canvasObj.isCursorInCell(this.mouse.moveX,this.mouse.moveY, currentBlockClick);
-        this.mouse.moveX = event.clientX - rect.left;
-        this.mouse.moveY = event.clientY - rect.top;
-        console.log("move");
-      }
+      document.getElementById('puzzle_canvas').addEventListener("mouseup", this.mouseHandlerUp);
+      document.getElementById('puzzle_canvas').addEventListener("mousemove", this.mouseHandlerMove);
     });
 
     this.canvasObj.canvas.addEventListener("click", (event) => {
-      console.log("it was click");
       const currentBlockClick = GamePuzzle.getBucketY(this.mouse.y ) + GamePuzzle.getBucketValue(this.mouse.x);
 
       console.log("Coordinate x: ".concat(this.mouse.x));
@@ -152,6 +179,44 @@ export class GamePuzzle {
       }
     });
   }
+
+  getCanvasRect() {
+    this.canvasRect = this.canvasObj.canvas.getBoundingClientRect();
+  }
+
+  onMouseMove(event) {
+    console.log("this.mouse");
+    console.log(this.mouse);
+    if (this.mouse.isDown) {
+      const rect = this.canvasObj.canvas.getBoundingClientRect();
+      // const currentBlockClick = GamePuzzle.getBucketY(this.mouse.x) + GamePuzzle.getBucketValue(this.mouse.y);
+
+      // this.canvasObj.isCursorInCell(this.mouse.moveX,this.mouse.moveY, currentBlockClick);
+      this.mouse.moveX = event.clientX - rect.left;
+      this.mouse.moveY = event.clientY - rect.top;
+
+      this.currCell.x = this.mouse.moveX;
+      this.currCell.y = this.mouse.moveY;
+
+      console.log("find cell");
+      console.log(this.currCell);
+      this.canvasObj.redrawCanvas();
+
+      console.log("move");
+    }
+  }
+
+  onMouseUp(event = null){
+    this.mouse.isDown = false;
+
+    this.currCell.x 
+
+    document.getElementById('puzzle_canvas').removeEventListener("mouseup", this.mouseHandlerUp);
+    document.getElementById('puzzle_canvas').removeEventListener("mousemove", this.mouseHandlerMove);
+
+    this.mouseHandlerMove = null;
+    this.mouseHandlerUp = null;
+  };
 
   updateTime(minutes, sec) {
     if (minutes === undefined || sec === undefined) {
