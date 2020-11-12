@@ -35,6 +35,9 @@ export class GamePuzzle {
     };
     this.mouseHandlerUp = null;
     this.mouseHandlerMove = null;
+    this.mouseHandlerLeave = null;
+    this.timer = null;
+    this.gameWin = false;
   }
 
   setSize(newSize){
@@ -121,6 +124,7 @@ export class GamePuzzle {
     this.mouseHandlerUp = null;
     this.mouseHandlerMove = null;
     this.mouseHandlerLeave = null;
+    this.gameWin = false;
     console.log("restartewd");
     console.log(this);
   }
@@ -168,7 +172,7 @@ export class GamePuzzle {
     });
 
     this.canvasObj.canvas.addEventListener("click", (event) => {
-      if (this.mouse.isClickAviable) {
+      if (this.mouse.isClickAviable && !this.gameWin) {
         const currentBlockClick = GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x, this.size);
         if (this.canvasObj.trySwap(currentBlockClick)) {
           this.mouse.isClickAviable = false;
@@ -177,11 +181,16 @@ export class GamePuzzle {
           }, 480 / this.size);
           this.audio["swipe"].play();
           this.stepCounter += 1;
-          this.updateTime()
+          this.updateTime();
           console.log("Step is correct. Count of steps = " + this.stepCounter);
-          if (this.canvasObj.checkWinCondition()) {
-            this.canvasObj.addWinText(this.stepCounter, this.checkTime());
-          } 
+          setTimeout(() => {
+            if (this.canvasObj.checkWinCondition()) {
+              this.canvasObj.addWinText(this.stepCounter, this.checkTime());
+              this.onMouseUp();
+              this.gameWin = true;
+              // this.restart();
+            } 
+          }, 480 / this.size);
         }
       } else {
         this.mouse.isClickAviable = true;
@@ -194,7 +203,7 @@ export class GamePuzzle {
   }
 
   onMouseLeave(event) {
-    if (this.mouse.isDown) {
+    if (this.mouse.isDown && !this.gameWin) {
       this.currCell.x = this.mouse.x;
       this.currCell.y = this.mouse.y;
       console.log("Покинули пределы канваса");
@@ -203,9 +212,7 @@ export class GamePuzzle {
   }
 
   onMouseMove(event) {
-    console.log("this.mouse");
-    console.log(this.mouse);
-    if (this.mouse.isDown) {
+    if (this.mouse.isDown && !this.gameWin) {
       const rect = this.canvasObj.canvas.getBoundingClientRect();
 
       this.mouse.moveX = event.clientX - rect.left;
@@ -232,54 +239,49 @@ export class GamePuzzle {
   }
 
   onMouseUp(event = null){
-    this.mouse.isDown = false;
+    if (!this.gameWin) {
+      this.mouse.isDown = false;
 
-    const thisWasCell   = GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x, this.size);
-    const cellWeleftOff = GamePuzzle.getBucketY(this.mouse.moveY, this.size) + GamePuzzle.getBucketValue(this.mouse.moveX, this.size);
-
-    if (this.mouse.moveX !== this.mouse.x || this.mouse.moveY !== this.mouse.y) {
-      const leftCondition   = this.canvasObj.checkLeft(thisWasCell) && thisWasCell - cellWeleftOff   === 1;
-      const topCondition    = this.canvasObj.checkTop(thisWasCell) && thisWasCell - cellWeleftOff    === this.size;
-      const rightCondition  = this.canvasObj.checkRight(thisWasCell) && thisWasCell - cellWeleftOff  === -1;
-      const bottomCondition = this.canvasObj.checkBottom(thisWasCell) && thisWasCell - cellWeleftOff === -this.size;
-      const fullCondition = leftCondition || topCondition || rightCondition || bottomCondition;
+      const thisWasCell   = GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x, this.size);
+      const cellWeleftOff = GamePuzzle.getBucketY(this.mouse.moveY, this.size) + GamePuzzle.getBucketValue(this.mouse.moveX, this.size);
   
-      console.log("leftCondition " + leftCondition);
-      console.log("topCondition " + topCondition);
-      console.log("rightCondition " + rightCondition);
-      console.log("bottomCondition " + bottomCondition);
-
-      this.currCell.x = (thisWasCell % this.size) * 480 / this.size;
-      this.currCell.y = Math.floor(thisWasCell / this.size) * 480 / this.size;
-      if (fullCondition) {
-        this.canvasObj.trySwap(thisWasCell);
+      if (this.mouse.moveX !== this.mouse.x || this.mouse.moveY !== this.mouse.y) {
+        const leftCondition   = this.canvasObj.checkLeft(thisWasCell) && thisWasCell - cellWeleftOff   === 1;
+        const topCondition    = this.canvasObj.checkTop(thisWasCell) && thisWasCell - cellWeleftOff    === this.size;
+        const rightCondition  = this.canvasObj.checkRight(thisWasCell) && thisWasCell - cellWeleftOff  === -1;
+        const bottomCondition = this.canvasObj.checkBottom(thisWasCell) && thisWasCell - cellWeleftOff === -this.size;
+        const fullCondition = leftCondition || topCondition || rightCondition || bottomCondition;
+    
+        console.log("leftCondition " + leftCondition);
+        console.log("topCondition " + topCondition);
+        console.log("rightCondition " + rightCondition);
+        console.log("bottomCondition " + bottomCondition);
+  
+        this.currCell.x = (thisWasCell % this.size) * 480 / this.size;
+        this.currCell.y = Math.floor(thisWasCell / this.size) * 480 / this.size;
+        if (fullCondition && !this.gameWin) {
+          this.canvasObj.trySwap(thisWasCell);
+          this.stepCounter += 1;
+          this.updateTime();
+          setTimeout(() => {
+            if (this.canvasObj.checkWinCondition()) {
+              this.canvasObj.addWinText(this.stepCounter, this.checkTime());
+              this.onMouseUp();
+              this.gameWin = true;
+              // this.restart();
+            } 
+          }, 480 / this.size);
+          
+        }
+        this.canvasObj.redrawCanvas();
       }
-     
-      // this.canvasObj.trySwap(thisWasCell);
-      /*if (leftCondition) {
-        // this.canvasObj.trySwap(thisWasCell);
-        this.canvasObj.swapOnX(thisWasCell, 1, -1);
-      } else if (topCondition) {
-        this.canvasObj.swapOnX(thisWasCell, this.size, 1);
-        // this.canvasObj.trySwap(thisWasCell);
-      } else if (rightCondition) {
-        // this.canvasObj.trySwap(thisWasCell);
-        this.canvasObj.swapOnX(thisWasCell, 1, 1);
-      } else if (bottomCondition) {
-        console.log("gem-puzzle botton");
-        console.log(thisWasCell);
-        this.canvasObj.swapOnX(thisWasCell, this.size, -1);
-      } */
+      document.getElementById('puzzle_canvas').removeEventListener("mouseup", this.mouseHandlerUp);
+      document.getElementById('puzzle_canvas').removeEventListener("mousemove", this.mouseHandlerMove);
+      document.getElementById('puzzle_canvas').removeEventListener("mouseleave", this.mouseHandlerLeave);
   
-
-       this.canvasObj.redrawCanvas();
+      this.mouseHandlerMove = null;
+      this.mouseHandlerUp = null;
     }
-    document.getElementById('puzzle_canvas').removeEventListener("mouseup", this.mouseHandlerUp);
-    document.getElementById('puzzle_canvas').removeEventListener("mousemove", this.mouseHandlerMove);
-    document.getElementById('puzzle_canvas').removeEventListener("mouseleave", this.mouseHandlerLeave);
-
-    this.mouseHandlerMove = null;
-    this.mouseHandlerUp = null;
   };
 
   updateTime(minutes, sec) {
@@ -303,8 +305,10 @@ export class GamePuzzle {
       itTookSec = newDate.getSeconds() - this.today.getSeconds();
     }
     this.updateTime(itTookMinutes, itTookSec);
-
-    setTimeout(this.startTimer.bind(this), 1000);
+    this.timer = this.startTimer.bind(this);
+    if (!this.gameWin) {
+      setTimeout(this.timer, 1000);
+    }
   }
 
   checkTime() {
@@ -329,44 +333,13 @@ export class GamePuzzle {
         return i / cellWidth;
       }
     }
-    /*if (x < 120) {
-      return 0;
-    }
-    if (x >= 120 && x < 240) {
-      return 1;
-    }
-    if (x >= 240 && x < 360) {
-      return 2;
-    }
-    if (x >= 360 && x < 481) {
-      return 3;
-    } */
+
     throw new Error("something goes wrong in GamePuzzle getBuchetY func");
   }
 
   static getBucketY(y, size) {
     const row = GamePuzzle.getBucketValue(y, size);
     return row * size;
-    /* switch (GamePuzzle.getBucketValue(y, size)) {
-      case 0: {
-        return 0;
-      }
-      case 1: {
-        console.log("getBucketY" + size);
-        return size;
-      }
-      case 2: {
-        console.log("getBucketY" + size * 2);
-        return size * 2;
-      }
-      case 3: {
-        console.log("getBucketY" + size * 3);
-        return size * 3;
-      }
-      default: {
-        throw new Error("something goes wrong in GamePuzzle getBuchetY func");
-      }
-    }*/
   }
   
 }

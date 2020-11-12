@@ -97,6 +97,7 @@ export class MyCanvas {
   }
 
   addWinText(step, time){
+    this.rectObjects = [];
     const context = this.canvas.getContext("2d");
     context.font = "30px Verdana";
     context.clearRect(0, 0, 480, 480);
