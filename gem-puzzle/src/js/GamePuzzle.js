@@ -224,30 +224,31 @@ export class GamePuzzle {
     const thisWasCell   = GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x, this.size);
     const cellWeleftOff = GamePuzzle.getBucketY(this.mouse.moveY, this.size) + GamePuzzle.getBucketValue(this.mouse.moveX, this.size);
 
-    const leftCondition   = this.canvasObj.checkLeft(thisWasCell) && thisWasCell - cellWeleftOff   === 1;
-    const topCondition    = this.canvasObj.checkTop(thisWasCell) && thisWasCell - cellWeleftOff    === this.size;
-    const rightCondition  = this.canvasObj.checkRight(thisWasCell) && thisWasCell - cellWeleftOff  === -1;
-    const bottomCondition = this.canvasObj.checkBottom(thisWasCell) && thisWasCell - cellWeleftOff === -this.size;
-
-    console.log("leftCondition " + leftCondition);
-    console.log("topCondition " + topCondition);
-    console.log("rightCondition " + rightCondition);
-    console.log("bottomCondition " + bottomCondition);
-
-    if (leftCondition) {
-      this.canvasObj.swapObject(thisWasCell, -1);
-    } else if (topCondition) {
-      this.canvasObj.swapObject(thisWasCell,-this.size);
-    } else if (rightCondition) {
-      this.canvasObj.swapObject(thisWasCell, 1);
-    } else if (bottomCondition) {
-      this.canvasObj.swapObject(thisWasCell, this.size);
+    if (this.mouse.moveX !== this.mouse.x || this.mouse.moveY !== this.mouse.y) {
+      const leftCondition   = this.canvasObj.checkLeft(thisWasCell) && thisWasCell - cellWeleftOff   === 1;
+      const topCondition    = this.canvasObj.checkTop(thisWasCell) && thisWasCell - cellWeleftOff    === this.size;
+      const rightCondition  = this.canvasObj.checkRight(thisWasCell) && thisWasCell - cellWeleftOff  === -1;
+      const bottomCondition = this.canvasObj.checkBottom(thisWasCell) && thisWasCell - cellWeleftOff === -this.size;
+  
+      console.log("leftCondition " + leftCondition);
+      console.log("topCondition " + topCondition);
+      console.log("rightCondition " + rightCondition);
+      console.log("bottomCondition " + bottomCondition);
+  
+      if (leftCondition) {
+        this.canvasObj.swapObject(thisWasCell, -1);
+      } else if (topCondition) {
+        this.canvasObj.swapObject(thisWasCell,-this.size);
+      } else if (rightCondition) {
+        this.canvasObj.swapObject(thisWasCell, 1);
+      } else if (bottomCondition) {
+        this.canvasObj.swapObject(thisWasCell, this.size);
+      }
+  
+      this.currCell.x = (thisWasCell % this.size) * 480 / this.size;
+      this.currCell.y = Math.floor(thisWasCell / this.size) * 480 / this.size;
+      this.canvasObj.redrawCanvas();
     }
-
-    this.currCell.x = (thisWasCell % this.size) * 480 / this.size;
-    this.currCell.y = Math.floor(thisWasCell / this.size) * 480 / this.size;
-    this.canvasObj.redrawCanvas();
-
     document.getElementById('puzzle_canvas').removeEventListener("mouseup", this.mouseHandlerUp);
     document.getElementById('puzzle_canvas').removeEventListener("mousemove", this.mouseHandlerMove);
 

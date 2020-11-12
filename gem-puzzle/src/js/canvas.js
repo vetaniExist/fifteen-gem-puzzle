@@ -102,18 +102,20 @@ export class MyCanvas {
   checkWinCondition(){
     // console.log("winCondArray = " + this.winConditionArray);
     // console.log("textDraw = " + this.textDraw);
-    if (this.winConditionArray === this.textDraw) {
+    const currentSituation = this.textDraw;// this.rectObjects.map(obj => obj.num);
+    tmpArray.map(numb => numb.num)
+    if (this.winConditionArray === currentSituation) {
       return true;
     }
-    if (this.winConditionArray == null || this.textDraw == null) {
+    if (this.winConditionArray == null || currentSituation == null) {
       return false;
     }
-    if (this.winConditionArray.length !== this.textDraw.length) {
+    if (this.winConditionArray.length !== currentSituation.length) {
       return false;
     }
 
     for (let i = 0; i < this.winConditionArray.length; ++i) {
-      if (this.winConditionArray[i] !== this.textDraw[i]) {
+      if (this.winConditionArray[i] !== currentSituation[i]) {
         return false;
       } 
     }
@@ -149,12 +151,7 @@ export class MyCanvas {
   }
 
   swapObject(currentCol,stepInArray) {
-    // swap in array
-    // console.log("get cur col = " + currentCol);
-    // console.log(this.rectObjects[currentCol]);
 
-   
-    
     const rectObjCur = this.getRectObj(currentCol);
     const rectObjPrev = this.getRectObj(currentCol + stepInArray);
     const tmp = Object.assign({}, rectObjCur);
@@ -169,11 +166,12 @@ export class MyCanvas {
     this.textDraw[currentCol] = this.textDraw[currentCol + stepInArray];
     this.textDraw[currentCol + stepInArray] = tmpVal;
 
-    // console.log("rectObjCur");
-    // console.log(rectObjCur);
-
-    // console.log("rectObjPrev");
-    // console.log(rectObjPrev);
+    
+    /* if (rectObjCur.x - rectObjPrev.x !== 0) {
+      this.animatedSwapX(currentCol, currentCol + stepInArray);
+    } else if (rectObjCur.y - rectObjPrev.y !== 0) {
+      this.animatedSwapY();
+    } */
 
 
     this.drawRect(rectObjCur);
@@ -183,67 +181,55 @@ export class MyCanvas {
     this.drawRect(rectObjPrev);
     this.strokeRect(rectObjPrev);
     this.fillTextInRect(rectObjPrev);
-
-
-
   }
 
-  swap(currentCol, stepX, stepY, stepInArray) {
-                // ------> x
+  animatedSwapX(newCellWithNum, newEmptyCell) {
+    const cellWithNum = this.getRectObj(newCellWithNum);
+    const emptyCell = this.getRectObj(newEmptyCell);
 
-      /*
-      y
-      ^
-      |
-      |
-      |
-      */
-    const context = this.canvas.getContext("2d");
-    const curY = Math.floor(currentCol / this.size);
-    const curX = currentCol % this.size;
-    // const curY = 15 - curX * 4;
+    const isUp = cellWithNum.x - emptyCell.x < 0;
+    const diff = Math.abs(cellWithNum.x - emptyCell.x);
+    if (isUp) {
+      for (let i = 0; i < diff; i += 1) {
+        setTimeout( () => {
+          cellWithNum.x += 1;
+          emptyCell.x -= 1
+          this.drawRect(cellWithNum);
+          this.strokeRect(cellWithNum);
+          this.fillTextInRect(cellWithNum);
 
-    console.log("curX = " + curX);
-    console.log("curY = " + curY);
+         
+          this.drawRect(emptyCell);
+          this.strokeRect(emptyCell);
+          this.fillTextInRect(emptyCell);
+        }, 1 * i);
+      }
+    } else {
+      for (let i = 0; i < diff; i += 1) {
+        setTimeout(() => {
+          cellWithNum.x -= 1;
+          emptyCell.x += 1
+          this.drawRect(cellWithNum);
+          this.strokeRect(cellWithNum);
+          this.fillTextInRect(cellWithNum);
 
-    const pixelDataCur = context.getImageData(curX * 120 + 5, curY * 120 + 5, 1, 1).data;
-    const pixelDataPrev = context.getImageData(curX * 120 + 5 + stepX, curY * 120 + 5 + stepY, 1, 1).data;
-
-
-    context.clearRect(curX * 120, curY * 120, 120, 120);
-    context.fillStyle = 'rgba('.concat(pixelDataPrev).concat(')');
-    context.fillRect(curX * 120, curY * 120, 120, 120);
-    context.strokeRect(curX * 120, curY * 120, 120, 120);
-
-    context.clearRect(curX * 120 + stepX, curY * 120 + stepY, 120, 120);
-    context.fillStyle = 'rgba('.concat(pixelDataCur).concat(')');
-    context.fillRect(curX * 120 + stepX, curY * 120 + stepY, 120, 120);
-    context.strokeRect(curX * 120 + stepX, curY * 120 + stepY, 120, 120);
-
-    context.fillStyle = "#000";
-    context.fillText(this.textDraw[currentCol], 120 * curX + 60 + stepX, 60 + 120 * curY + stepY);
-
-    const tmpVal = this.textDraw[currentCol];
-    this.textDraw[currentCol] = this.textDraw[currentCol + stepInArray];
-    this.textDraw[currentCol + stepInArray] = tmpVal;
-  }
-
-  isCursorInCell(x, y, checkedCell){
-    const curY = Math.floor(checkedCell / this.size);
-    const curX = checkedCell % this.size;
-
-    const minY = curY * 120;
-    const minX = curX * 120;
-
-    const isOnXLine = x >= minX && x <= minX + 120;
-    const isOnYLine = y >= minY && y <= minY + 120;
-
-    if (isOnXLine && isOnYLine) {
-      return true;
+          
+          this.drawRect(emptyCell);
+          this.strokeRect(emptyCell);
+          this.fillTextInRect(emptyCell);
+        }, 1 *i);
+      } 
     }
-    return false;
+    const tmp = cellWithNum.num;
+    cellWithNum.num = ""
+    emptyCell.num = tmp;
+   
   }
-  
+
+  animatedSwapY(newCellWithNum, newEmptyCell) {
+
+  }
+
   checkLeft(currentCol) {
     
     for (let i = 0; i <  this.size; i += 1) {
