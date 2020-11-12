@@ -43,6 +43,8 @@ export class MyCanvas {
         this.fillTextInRect(rectObj);
       }
     }
+    console.log("start: ");
+    console.log(this.rectObjects);
   }
 
   redrawCanvas(managedObject = null){
@@ -66,11 +68,18 @@ export class MyCanvas {
     }
   }
 
+  rectClear(rectObj) {
+    const context = this.canvas.getContext("2d");
+    context.fillStyle = "rgba(0,0,0,0)";
+    context.clearRect(rectObj.x, rectObj.y, rectObj.w, rectObj.h);
+  }
+
   drawRect(rectObj){
     // console.log(rectObj);
     const context = this.canvas.getContext("2d");
-    context.fillStyle = rectObj.color;
+    context.fillStyle = "rgba(0,0,0,0)";
     context.clearRect(rectObj.x, rectObj.y, rectObj.w, rectObj.h);
+    context.fillStyle = rectObj.color;
     context.fillRect(rectObj.x, rectObj.y, rectObj.w, rectObj.h);
     
     // context.strokeRect(rectObj.x * rectObj.w, rectObj.y * rectObj.h, rectObj.w, rectObj.h);
@@ -103,7 +112,7 @@ export class MyCanvas {
     // console.log("winCondArray = " + this.winConditionArray);
     // console.log("textDraw = " + this.textDraw);
     const currentSituation = this.textDraw;// this.rectObjects.map(obj => obj.num);
-    tmpArray.map(numb => numb.num)
+    // tmpArray.map(numb => numb.num)
     if (this.winConditionArray === currentSituation) {
       return true;
     }
@@ -126,20 +135,25 @@ export class MyCanvas {
   trySwap(currentCol) {
     if (this.checkLeft(currentCol)) {
       // this.swap(currentCol, -120, 0, -1);
+      console.log("try swap = left")
       this.swapObject(currentCol, -1);
       return true;
 
     } else if (this.checkTop(currentCol)) {
-      // this.swap(currentCol, 0, -120, -4);
+      // this.swap(currentCol, 0, -120, -4);\
+      console.log("try swap = top")
       this.swapObject(currentCol,-this.size);
       return true;
 
     } else if (this.checkRight(currentCol)) {
+      console.log("try swap = right")
       this.swapObject(currentCol, 1);
       return true;
 
     } else if (this.checkBottom(currentCol)){
       // this.swap(currentCol, 0, 120, 4);
+      console.log("try swap = bottom")
+      console.log(currentCol);
       this.swapObject(currentCol, this.size);
       return true;
     }
@@ -147,7 +161,88 @@ export class MyCanvas {
   }
 
   getRectObj(currentCol) {
-    return this.rectObjects.filter( obj => obj.num === currentCol)[0];
+    return this.rectObjects[currentCol];
+    // return this.rectObjects.filter( obj => obj.num === currentCol)[0];
+  }
+
+  swapObjectProperties(currentCol,stepInArray) {
+    const rectObjCur = this.getRectObj(currentCol);
+    const rectObjPrev = this.getRectObj(currentCol + stepInArray);
+    const tmp = Object.assign({}, rectObjCur);
+
+    rectObjCur.num = rectObjPrev.num
+    rectObjCur.x = rectObjPrev.x
+    rectObjCur.y = rectObjPrev.y
+    rectObjCur.w = rectObjPrev.w
+    rectObjCur.h = rectObjPrev.h
+    rectObjCur.color = rectObjPrev.color
+    rectObjCur.text = rectObjPrev.text
+
+    rectObjPrev.num = tmp.num
+    rectObjPrev.x = tmp.x
+    rectObjPrev.y = tmp.y
+    rectObjPrev.w = tmp.w
+    rectObjPrev.h = tmp.h
+    rectObjPrev.color = tmp.color
+    rectObjPrev.text = tmp.text
+  }
+
+  swapOnX(currentCol,stepInArray, step) {
+    const rectObjCur = this.getRectObj(currentCol);
+    const rectObjPrev = this.getRectObj(currentCol + stepInArray);
+    for (let i = 0; i < rectObjCur.w; i += 1) {
+      setTimeout( () => {
+        console.log("isWork")
+        this.rectClear(rectObjCur);
+        this.rectClear(rectObjPrev);
+        rectObjCur.x += step;
+        rectObjPrev.x -= step;
+
+        this.drawRect(rectObjPrev);
+        this.strokeRect(rectObjPrev);
+        this.fillTextInRect(rectObjPrev);
+
+        this.drawRect(rectObjCur);
+        this.strokeRect(rectObjCur);
+        this.fillTextInRect(rectObjCur);
+        if (i === rectObjCur.w -  1) {
+          console.log("after: ");
+          console.log(this.rectObjects); 
+          this.swapObjectProperties(currentCol, stepInArray);
+          console.log("after2: ");
+          console.log(this.rectObjects); 
+        }
+      }, 1 * i);
+    }
+  }
+
+  swapOnY(currentCol,stepInArray, step) {
+    const rectObjCur = this.getRectObj(currentCol);
+    const rectObjPrev = this.getRectObj(currentCol + stepInArray);
+    for (let i = 0; i < rectObjCur.h; i += 1) {
+      setTimeout( () => {
+        console.log("isWork")
+        this.rectClear(rectObjCur);
+        this.rectClear(rectObjPrev);
+        rectObjCur.y += step;
+        rectObjPrev.y -= step;
+
+        this.drawRect(rectObjPrev);
+        this.strokeRect(rectObjPrev);
+        this.fillTextInRect(rectObjPrev);
+
+        this.drawRect(rectObjCur);
+        this.strokeRect(rectObjCur);
+        this.fillTextInRect(rectObjCur);
+        if (i === rectObjCur.w -  1) {
+          console.log("after: ");
+          console.log(this.rectObjects); 
+          this.swapObjectProperties(currentCol, stepInArray);
+          console.log("after2: ");
+          console.log(this.rectObjects); 
+        }
+      }, 1 * i);
+    }
   }
 
   swapObject(currentCol,stepInArray) {
@@ -155,24 +250,35 @@ export class MyCanvas {
     const rectObjCur = this.getRectObj(currentCol);
     const rectObjPrev = this.getRectObj(currentCol + stepInArray);
     const tmp = Object.assign({}, rectObjCur);
-
-    rectObjCur.color = rectObjPrev.color;
-    rectObjCur.text = rectObjPrev.text;
-
-    rectObjPrev.color = tmp.color;
-    rectObjPrev.text = tmp.text;
+    const tmpPrev = Object.assign({}, rectObjPrev);
 
     const tmpVal = this.textDraw[currentCol];
     this.textDraw[currentCol] = this.textDraw[currentCol + stepInArray];
     this.textDraw[currentCol + stepInArray] = tmpVal;
 
-    
-    /* if (rectObjCur.x - rectObjPrev.x !== 0) {
-      this.animatedSwapX(currentCol, currentCol + stepInArray);
-    } else if (rectObjCur.y - rectObjPrev.y !== 0) {
-      this.animatedSwapY();
-    } */
+    const isUpX = rectObjCur.x - rectObjPrev.x < 0;
+    const isUpY = rectObjCur.y - rectObjPrev.y < 0;
+    const isDownX = rectObjCur.x - rectObjPrev.x > 0;
+    const isDownY = rectObjCur.y - rectObjPrev.y > 0;
 
+    if (isUpX) {
+      console.log("is Up");
+      console.log(tmp);
+      console.log(tmpPrev);
+      this.swapOnX(currentCol, stepInArray, 1);
+     
+    } else if (isDownX) {
+      this.swapOnX(currentCol, stepInArray, -1);
+    } else if (isUpY) {
+      this.swapOnY(currentCol,stepInArray, 1);
+    } else if (isDownY) {
+      this.swapOnY(currentCol,stepInArray, -1);
+    }
+    /* rectObjCur.color = rectObjPrev.color;
+    rectObjCur.text = rectObjPrev.text;
+
+    rectObjPrev.color = tmp.color;
+    rectObjPrev.text = tmp.text;
 
     this.drawRect(rectObjCur);
     this.strokeRect(rectObjCur);
@@ -180,11 +286,15 @@ export class MyCanvas {
 
     this.drawRect(rectObjPrev);
     this.strokeRect(rectObjPrev);
-    this.fillTextInRect(rectObjPrev);
+    this.fillTextInRect(rectObjPrev); */
+    
+   // if (rectObjCur.y - rectObjPrev.y !== 0) {
+     
+    //} 
   }
 
-  animatedSwapX(newCellWithNum, newEmptyCell) {
-    const cellWithNum = this.getRectObj(newCellWithNum);
+  animatedSwapX(cellWeClick, newEmptyCell) {
+    const cellWithNum = this.getRectObj(cellWeClick);
     const emptyCell = this.getRectObj(newEmptyCell);
 
     const isUp = cellWithNum.x - emptyCell.x < 0;
@@ -204,7 +314,7 @@ export class MyCanvas {
           this.fillTextInRect(emptyCell);
         }, 1 * i);
       }
-    } else {
+    } /* else {
       for (let i = 0; i < diff; i += 1) {
         setTimeout(() => {
           cellWithNum.x -= 1;
@@ -219,10 +329,10 @@ export class MyCanvas {
           this.fillTextInRect(emptyCell);
         }, 1 *i);
       } 
-    }
-    const tmp = cellWithNum.num;
-    cellWithNum.num = ""
-    emptyCell.num = tmp;
+    } */
+    // const tmp = cellWithNum.num;
+    //cellWithNum.num = ""
+    // emptyCell.num = tmp;
    
   }
 

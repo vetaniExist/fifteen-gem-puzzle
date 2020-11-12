@@ -123,6 +123,7 @@ export class GamePuzzle {
     };
     this.mouseHandlerUp = null;
     this.mouseHandlerMove = null;
+    this.mouseHandlerLeave = null;
     console.log("restartewd");
     console.log(this);
   }
@@ -162,9 +163,11 @@ export class GamePuzzle {
       
       this.mouseHandlerUp =  this.onMouseUp.bind(this);
       this.mouseHandlerMove = this.onMouseMove.bind(this);
+      this.mouseHandlerLeave = this.onMouseLeave.bind(this);
 
       document.getElementById('puzzle_canvas').addEventListener("mouseup", this.mouseHandlerUp);
       document.getElementById('puzzle_canvas').addEventListener("mousemove", this.mouseHandlerMove);
+      document.getElementById('puzzle_canvas').addEventListener("mouseleave", this.mouseHandlerLeave);
     });
 
     this.canvasObj.canvas.addEventListener("click", (event) => {
@@ -187,6 +190,15 @@ export class GamePuzzle {
 
   getCanvasRect() {
     this.canvasRect = this.canvasObj.canvas.getBoundingClientRect();
+  }
+
+  onMouseLeave(event) {
+    if (this.mouse.isDown) {
+      this.currCell.x = this.mouse.x;
+      this.currCell.y = this.mouse.y;
+      console.log("Покинули пределы канваса");
+      this.canvasObj.redrawCanvas(this.currCell);
+    }
   }
 
   onMouseMove(event) {
@@ -229,28 +241,41 @@ export class GamePuzzle {
       const topCondition    = this.canvasObj.checkTop(thisWasCell) && thisWasCell - cellWeleftOff    === this.size;
       const rightCondition  = this.canvasObj.checkRight(thisWasCell) && thisWasCell - cellWeleftOff  === -1;
       const bottomCondition = this.canvasObj.checkBottom(thisWasCell) && thisWasCell - cellWeleftOff === -this.size;
+      const fullCondition = leftCondition || topCondition || rightCondition || bottomCondition;
   
       console.log("leftCondition " + leftCondition);
       console.log("topCondition " + topCondition);
       console.log("rightCondition " + rightCondition);
       console.log("bottomCondition " + bottomCondition);
-  
-      if (leftCondition) {
-        this.canvasObj.swapObject(thisWasCell, -1);
-      } else if (topCondition) {
-        this.canvasObj.swapObject(thisWasCell,-this.size);
-      } else if (rightCondition) {
-        this.canvasObj.swapObject(thisWasCell, 1);
-      } else if (bottomCondition) {
-        this.canvasObj.swapObject(thisWasCell, this.size);
-      }
-  
+
       this.currCell.x = (thisWasCell % this.size) * 480 / this.size;
       this.currCell.y = Math.floor(thisWasCell / this.size) * 480 / this.size;
-      this.canvasObj.redrawCanvas();
+      if (fullCondition) {
+        this.canvasObj.trySwap(thisWasCell);
+      }
+     
+      // this.canvasObj.trySwap(thisWasCell);
+      /*if (leftCondition) {
+        // this.canvasObj.trySwap(thisWasCell);
+        this.canvasObj.swapOnX(thisWasCell, 1, -1);
+      } else if (topCondition) {
+        this.canvasObj.swapOnX(thisWasCell, this.size, 1);
+        // this.canvasObj.trySwap(thisWasCell);
+      } else if (rightCondition) {
+        // this.canvasObj.trySwap(thisWasCell);
+        this.canvasObj.swapOnX(thisWasCell, 1, 1);
+      } else if (bottomCondition) {
+        console.log("gem-puzzle botton");
+        console.log(thisWasCell);
+        this.canvasObj.swapOnX(thisWasCell, this.size, -1);
+      } */
+  
+
+       this.canvasObj.redrawCanvas();
     }
     document.getElementById('puzzle_canvas').removeEventListener("mouseup", this.mouseHandlerUp);
     document.getElementById('puzzle_canvas').removeEventListener("mousemove", this.mouseHandlerMove);
+    document.getElementById('puzzle_canvas').removeEventListener("mouseleave", this.mouseHandlerLeave);
 
     this.mouseHandlerMove = null;
     this.mouseHandlerUp = null;
