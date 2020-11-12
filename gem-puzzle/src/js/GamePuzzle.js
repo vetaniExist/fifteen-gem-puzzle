@@ -48,10 +48,11 @@ export class GamePuzzle {
     switch(this.size) {
       case 4: {
         fieldOfCellValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-        console.log("configurate basic field");
         break;
       }
       case 3: {
+        fieldOfCellValues = [1, 2, 3, 4, 5, 6, 7, 8];
+        break;
         
       }
       case 8: {

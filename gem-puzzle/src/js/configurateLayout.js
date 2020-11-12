@@ -20,7 +20,20 @@ const canvas = createEl("canvas");
 const controlButtonsDiv = createEl("div");
 
 const buttonStart = configurateButton("start");
+const buttonSetting = configurateButton("setting");
 const buttonBestScore = configurateButton("best score");
+
+const buttonSettingFieldSize = configurateButton("field size");
+const buttomSettingVolume = configurateButton("volume");
+
+const buttonSettingField3x3 = configurateButton("3x3");
+const buttonSettingField4x4 = configurateButton("4x4");
+const buttonSettingField8x8 = configurateButton("8x8");
+
+const buttonSettingVolumeUp = configurateButton("volume up");
+const buttonSettingVolumeDown = configurateButton("volume down");
+
+const buttonSettingBack = configurateButton("back");
 
 function configurateLayout() {
   wrapper.classList.add("wrapper");
@@ -32,6 +45,7 @@ function configurateLayout() {
   // button_start.setAttribute("hidden", true);
 
   controlButtonsDiv.appendChild(buttonStart);
+  controlButtonsDiv.appendChild(buttonSetting);
   controlButtonsDiv.appendChild(buttonBestScore);
 
   canvasDiv.appendChild(time)
@@ -51,10 +65,63 @@ function getTimeInnerText(){
   return time.innerText;
 }
 
+function settingLayout(){
+  controlButtonsDiv.innerHTML = "";
+  controlButtonsDiv.appendChild(buttonSettingFieldSize);
+  controlButtonsDiv.appendChild(buttomSettingVolume);
+  controlButtonsDiv.appendChild(buttonSettingBack);
+}
+
+function settingFieldSize(){
+  controlButtonsDiv.innerHTML = "";
+  controlButtonsDiv.appendChild(buttonSettingField3x3);
+  controlButtonsDiv.appendChild(buttonSettingField4x4);
+  controlButtonsDiv.appendChild(buttonSettingField8x8);
+
+  controlButtonsDiv.appendChild(buttonSetting);
+}
+
+function settingVolome() {
+  controlButtonsDiv.innerHTML = "";
+  controlButtonsDiv.appendChild(buttonSettingVolumeUp);
+  controlButtonsDiv.appendChild(buttonSettingVolumeDown);
+
+  controlButtonsDiv.appendChild(buttonSetting);
+}
+
+function settingStartPosition() {
+  controlButtonsDiv.innerHTML = "";
+  controlButtonsDiv.appendChild(buttonStart);
+  controlButtonsDiv.appendChild(buttonSetting);
+  controlButtonsDiv.appendChild(buttonBestScore);
+}
+
+function initializeControlButtons() {
+  
+  buttonSetting.addEventListener("click", () => {
+    settingLayout();
+  });
+  
+  buttonSettingBack.addEventListener("click", () => {
+    settingStartPosition();
+  });
+
+  buttonSettingFieldSize.addEventListener("click", () => {
+    settingFieldSize();
+  });
+
+  buttomSettingVolume.addEventListener("click", () => {
+    settingVolome();
+  });
+  
+}
+
+
 module.exports = {
   configurateLayout,
   canvas,
   buttonStart,
   updateTimeEl,
   getTimeInnerText,
+  initializeControlButtons,
 };
