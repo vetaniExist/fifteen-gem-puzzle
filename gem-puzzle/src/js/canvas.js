@@ -5,13 +5,17 @@ export class MyCanvas {
     this.textDraw = [];
     this.winConditionArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, ""];
     this.rectObjects = [];
+    this.size = null;
   }
 
   static getRandomInt(newMax) {
     return Math.floor(Math.random() * Math.floor(newMax));
   }
 
-  initBasicField(valueArray = this.textDraw, size = 4) {
+  initBasicField(valueArray, size, winCondition) {
+    this.rectObjects = [];
+    this.size = size;
+    this.winConditionArray = winCondition;
     this.textDraw = valueArray;
     // console.log(this.textDraw);
     this.canvas.height = 480;
@@ -21,18 +25,18 @@ export class MyCanvas {
 
     for (let i = 0; i < size; i += 1) {
       for (let j = 0; j < size; j += 1) {
-        console.log(valueArray[i * 4 + j]);
+        console.log(valueArray[i * size + j]);
         let rectObj = {
-          num: i + j * 4,
+          num: i + j * this.size,
           x: i * 120,
           y: j * 120,
           w: 120,
           h: 120,
           color: this.styles[MyCanvas.getRandomInt(4)],
-          text: valueArray[i + j * 4],
+          text: valueArray[i + j * this.size],
         }
 
-        this.rectObjects[i + j * 4] = (rectObj);
+        this.rectObjects[i + j * this.size] = (rectObj);
 
         this.drawRect(rectObj);
         this.strokeRect(rectObj);
@@ -44,9 +48,9 @@ export class MyCanvas {
   redrawCanvas(managedObject = null){
     const context = this.canvas.getContext("2d");
     context.clearRect(0, 0, 480, 480);
-    for (let i = 0; i < 4; i += 1) {
-      for (let j = 0; j < 4; j += 1) {
-        const rectObj = this.getRectObj(i + j * 4);
+    for (let i = 0; i < this.size; i += 1) {
+      for (let j = 0; j < this.size; j += 1) {
+        const rectObj = this.getRectObj(i + j * this.size);
         if (managedObject !== null && managedObject === rectObj) {
           continue;
         }
@@ -125,7 +129,7 @@ export class MyCanvas {
 
     } else if (this.checkTop(currentCol)) {
       // this.swap(currentCol, 0, -120, -4);
-      this.swapObject(currentCol,-4);
+      this.swapObject(currentCol,-this.size);
       return true;
 
     } else if (this.checkRight(currentCol)) {
@@ -134,7 +138,7 @@ export class MyCanvas {
 
     } else if (this.checkBottom(currentCol)){
       // this.swap(currentCol, 0, 120, 4);
-      this.swapObject(currentCol, 4);
+      this.swapObject(currentCol, this.size);
       return true;
     }
     return false;
@@ -195,8 +199,8 @@ export class MyCanvas {
       |
       */
     const context = this.canvas.getContext("2d");
-    const curY = Math.floor(currentCol / 4);
-    const curX = currentCol % 4;
+    const curY = Math.floor(currentCol / this.size);
+    const curX = currentCol % this.size;
     // const curY = 15 - curX * 4;
 
     console.log("curX = " + curX);
@@ -225,8 +229,8 @@ export class MyCanvas {
   }
 
   isCursorInCell(x, y, checkedCell){
-    const curY = Math.floor(checkedCell / 4);
-    const curX = checkedCell % 4;
+    const curY = Math.floor(checkedCell / this.size);
+    const curX = checkedCell % this.size;
 
     const minY = curY * 120;
     const minX = curX * 120;
@@ -241,7 +245,7 @@ export class MyCanvas {
   }
   
   checkLeft(currentCol) {
-    if ( currentCol === (0 || 4 || 8 || 12)){
+    if ( currentCol === (0 || 1 * this.size || 2 * this.size || 3 * this.size)){
       return false;
     } else if (this.textDraw[currentCol - 1] === "") {
       return true;
@@ -250,16 +254,16 @@ export class MyCanvas {
   }
 
   checkTop(currentCol){
-    if ( currentCol === (0 || 1 || 2 || 3)){
+    if ( currentCol < this.size){ // 0 1 2 3
       return false;
-    } else if (this.textDraw[currentCol - 4] === "") {
+    } else if (this.textDraw[currentCol - this.size] === "") {
       return true;
     } 
     return false;
   }
 
   checkRight(currentCol){
-    if ( currentCol === (3 || 7 || 11 || 15)){
+    if ( currentCol === (this.size - 1|| 2 * this.size - 1 || 3 * this.size - 1 || 4 *  this.size - 1)){
       return false;
     } else if (this.textDraw[currentCol + 1] === "") {
       return true;
@@ -268,9 +272,9 @@ export class MyCanvas {
   }
 
   checkBottom(currentCol){
-    if ( currentCol === (12 || 13 || 14 || 15)){
+    if ( currentCol > this.size * this.size - this.size){
       return false;
-    } else if (this.textDraw[currentCol + 4] === "") {
+    } else if (this.textDraw[currentCol + this.size] === "") {
       return true;
     } 
     return false;

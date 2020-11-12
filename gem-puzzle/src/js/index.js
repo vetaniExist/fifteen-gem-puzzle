@@ -2,6 +2,7 @@ import {
   configurateLayout,
   canvas,
   buttonStart,
+  buttonSettingField3x3,
   initializeControlButtons,
 } from "./configurateLayout";
 
@@ -18,6 +19,12 @@ window.addEventListener("load", () => {
 });
 
 buttonStart.addEventListener("click", () => {
+  gamePuzzle.start();
+});
+
+buttonSettingField3x3.addEventListener("click", () => {
+  gamePuzzle.setSize(3);
+  console.log(gamePuzzle.getSize());
   gamePuzzle.start();
 });
 

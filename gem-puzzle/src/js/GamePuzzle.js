@@ -16,6 +16,7 @@ import {
 export class GamePuzzle {
   constructor(canvas) {
     this.startArray = [];
+    this.winCondition = [];
     this.canvas = canvas;
     this.canvasObj = new MyCanvas(this.canvas);
     this.canvasRect = null;
@@ -36,6 +37,14 @@ export class GamePuzzle {
     this.mouseHandlerMove = null;
   }
 
+  setSize(newSize){
+    this.size = newSize;
+  }
+
+  getSize() {
+    return this.size;
+  }
+
   initAudio(){
     let audio_swipe = document.createElement("audio");
     audio_swipe.setAttribute("src", "/src/assets/sounds/tink.wav");
@@ -48,10 +57,12 @@ export class GamePuzzle {
     switch(this.size) {
       case 4: {
         fieldOfCellValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+        this.winCondition = fieldOfCellValues.slice();
         break;
       }
       case 3: {
         fieldOfCellValues = [1, 2, 3, 4, 5, 6, 7, 8];
+        this.winCondition = fieldOfCellValues.slice();
         break;
         
       }
@@ -70,6 +81,7 @@ export class GamePuzzle {
     }
     if (this.isSolved(this.startArray)) {
       this.startArray.push("");
+      this.winCondition.push("");
     } else {
       console.log("restart");
       this.configurateStartField();
@@ -91,6 +103,11 @@ export class GamePuzzle {
     }
     // console.log("inversesCounter " + inversesCounter);
     // console.log("inversesCounter % 2 === 0" + inversesCounter % 2 === 0)
+    inversesCounter += this.size;
+    let isOddSize = this.size % 2;
+    if (isOddSize) {
+      return inversesCounter % 2 === 0 ? false : true;
+    }
     return inversesCounter % 2 === 0 ? true : false;
   }
 
@@ -108,7 +125,7 @@ export class GamePuzzle {
     this.canvasRect = null;
     this.stepCounter = 0;
     this.today = null;
-    this.size = 4;
+    // this.size = 4;
     this.audio = [];
     this.mouse = {
       x: 0,
@@ -132,8 +149,13 @@ export class GamePuzzle {
 
     this.initAudio();
     this.configurateStartField();
-    
-    this.canvasObj.initBasicField(this.startArray, 4);
+    console.log("start with this nums:");
+    console.log(this.startArray);
+
+    console.log("start with this winCondition:");
+    console.log(this.winCondition);
+
+    this.canvasObj.initBasicField(this.startArray, this.size, this.winCondition);
     this.getCanvasRect();
     this.today = new Date();
     this.stepCounter = 0;
@@ -149,7 +171,7 @@ export class GamePuzzle {
       this.mouse.moveX = this.mouse.x;
       this.mouse.moveY = this.mouse.y;
 
-      this.currCell = this.canvasObj.getRectObj(GamePuzzle.getBucketY(this.mouse.y ) + GamePuzzle.getBucketValue(this.mouse.x));
+      this.currCell = this.canvasObj.getRectObj(GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x));
 
       this.mouse.isDown = true;
       
@@ -162,7 +184,7 @@ export class GamePuzzle {
 
     this.canvasObj.canvas.addEventListener("click", (event) => {
       if (this.mouse.isClickAviable) {
-        const currentBlockClick = GamePuzzle.getBucketY(this.mouse.y ) + GamePuzzle.getBucketValue(this.mouse.x);
+        const currentBlockClick = GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x);
         if (this.canvasObj.trySwap(currentBlockClick)) {
           this.audio["swipe"].play();
           this.stepCounter += 1;
@@ -214,13 +236,13 @@ export class GamePuzzle {
   onMouseUp(event = null){
     this.mouse.isDown = false;
 
-    const thisWasCell   = GamePuzzle.getBucketY(this.mouse.y) + GamePuzzle.getBucketValue(this.mouse.x);
-    const cellWeleftOff = GamePuzzle.getBucketY(this.mouse.moveY) + GamePuzzle.getBucketValue(this.mouse.moveX);
+    const thisWasCell   = GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x);
+    const cellWeleftOff = GamePuzzle.getBucketY(this.mouse.moveY, this.size) + GamePuzzle.getBucketValue(this.mouse.moveX);
 
     const leftCondition   = this.canvasObj.checkLeft(thisWasCell) && thisWasCell - cellWeleftOff   === 1;
-    const topCondition    = this.canvasObj.checkTop(thisWasCell) && thisWasCell - cellWeleftOff    === 4;
+    const topCondition    = this.canvasObj.checkTop(thisWasCell) && thisWasCell - cellWeleftOff    === this.size;
     const rightCondition  = this.canvasObj.checkRight(thisWasCell) && thisWasCell - cellWeleftOff  === -1;
-    const bottomCondition = this.canvasObj.checkBottom(thisWasCell) && thisWasCell - cellWeleftOff === -4;
+    const bottomCondition = this.canvasObj.checkBottom(thisWasCell) && thisWasCell - cellWeleftOff === -this.size;
 
     console.log("leftCondition " + leftCondition);
     console.log("topCondition " + topCondition);
@@ -230,15 +252,15 @@ export class GamePuzzle {
     if (leftCondition) {
       this.canvasObj.swapObject(thisWasCell, -1);
     } else if (topCondition) {
-      this.canvasObj.swapObject(thisWasCell,-4);
+      this.canvasObj.swapObject(thisWasCell,-this.size);
     } else if (rightCondition) {
       this.canvasObj.swapObject(thisWasCell, 1);
     } else if (bottomCondition) {
-      this.canvasObj.swapObject(thisWasCell, 4);
+      this.canvasObj.swapObject(thisWasCell, this.size);
     }
 
-    this.currCell.x = (thisWasCell % 4) * 120;
-    this.currCell.y = Math.floor(thisWasCell / 4) * 120;
+    this.currCell.x = (thisWasCell % this.size) * 120;
+    this.currCell.y = Math.floor(thisWasCell / this.size) * 120;
     this.canvasObj.redrawCanvas();
 
     document.getElementById('puzzle_canvas').removeEventListener("mouseup", this.mouseHandlerUp);
@@ -301,19 +323,22 @@ export class GamePuzzle {
     throw new Error("something goes wrong in GamePuzzle getBuchetY func");
   }
 
-  static getBucketY(y) {
+  static getBucketY(y, size) {
     switch (GamePuzzle.getBucketValue(y)) {
       case 0: {
         return 0;
       }
       case 1: {
-        return 4;
+        console.log("getBucketY" + size);
+        return size;
       }
       case 2: {
-        return 8;
+        console.log("getBucketY" + size * 2);
+        return size * 2;
       }
       case 3: {
-        return 12;
+        console.log("getBucketY" + size * 3);
+        return size * 3;
       }
       default: {
         throw new Error("something goes wrong in GamePuzzle getBuchetY func");
