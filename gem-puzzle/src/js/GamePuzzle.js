@@ -76,7 +76,6 @@ export class GamePuzzle {
   }
 
   isSolved(field) {
-    // console.log("isSolved");
     let inversesCounter = 0;
     for (let i = 1; i < this.size * this.size - 1; i += 1) {
       for (let j = 0; j < i; j += 1) {
@@ -86,8 +85,7 @@ export class GamePuzzle {
       }
      
     }
-    // console.log("inversesCounter " + inversesCounter);
-    // console.log("inversesCounter % 2 === 0" + inversesCounter % 2 === 0)
+
     inversesCounter += this.size;
     let isOddSize = this.size % 2;
     if (isOddSize) {
@@ -110,7 +108,6 @@ export class GamePuzzle {
     this.canvasRect = null;
     this.stepCounter = 0;
     this.today = null;
-    // this.size = 4;
     this.audio = [];
     this.mouse = {
       x: 0,
@@ -174,11 +171,15 @@ export class GamePuzzle {
       if (this.mouse.isClickAviable) {
         const currentBlockClick = GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x, this.size);
         if (this.canvasObj.trySwap(currentBlockClick)) {
+          this.mouse.isClickAviable = false;
+          setTimeout(() => {
+            this.mouse.isClickAviable = true;
+          }, 480 / this.size);
           this.audio["swipe"].play();
           this.stepCounter += 1;
           this.updateTime()
           console.log("Step is correct. Count of steps = " + this.stepCounter);
-          if(this.canvasObj.checkWinCondition()) {
+          if (this.canvasObj.checkWinCondition()) {
             this.canvasObj.addWinText(this.stepCounter, this.checkTime());
           } 
         }
