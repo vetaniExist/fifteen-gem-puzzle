@@ -54,26 +54,11 @@ export class GamePuzzle {
   configurateStartField() {
     let fieldOfCellValues = [];
     this.startArray = [];
-    switch(this.size) {
-      case 4: {
-        fieldOfCellValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-        this.winCondition = fieldOfCellValues.slice();
-        break;
-      }
-      case 3: {
-        fieldOfCellValues = [1, 2, 3, 4, 5, 6, 7, 8];
-        this.winCondition = fieldOfCellValues.slice();
-        break;
-        
-      }
-      case 8: {
-
-      }
-      default: {
-        throw new Error("configurateStartField func err. This field size not implimented");
-      }
+    for (let i = 1; i < this.size * this.size; i += 1) {
+      fieldOfCellValues.push(i);
     }
-
+    this.winCondition = fieldOfCellValues.slice();
+    
     for(let i = 0; i < this.size * this.size - 1; i += 1) {
       let randCeil = getRandomInt(fieldOfCellValues.length);
       this.startArray.push(fieldOfCellValues[randCeil]);
@@ -171,7 +156,7 @@ export class GamePuzzle {
       this.mouse.moveX = this.mouse.x;
       this.mouse.moveY = this.mouse.y;
 
-      this.currCell = this.canvasObj.getRectObj(GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x));
+      this.currCell = this.canvasObj.getRectObj(GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x, this.size));
 
       this.mouse.isDown = true;
       
@@ -184,7 +169,7 @@ export class GamePuzzle {
 
     this.canvasObj.canvas.addEventListener("click", (event) => {
       if (this.mouse.isClickAviable) {
-        const currentBlockClick = GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x);
+        const currentBlockClick = GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x, this.size);
         if (this.canvasObj.trySwap(currentBlockClick)) {
           this.audio["swipe"].play();
           this.stepCounter += 1;
@@ -236,8 +221,8 @@ export class GamePuzzle {
   onMouseUp(event = null){
     this.mouse.isDown = false;
 
-    const thisWasCell   = GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x);
-    const cellWeleftOff = GamePuzzle.getBucketY(this.mouse.moveY, this.size) + GamePuzzle.getBucketValue(this.mouse.moveX);
+    const thisWasCell   = GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x, this.size);
+    const cellWeleftOff = GamePuzzle.getBucketY(this.mouse.moveY, this.size) + GamePuzzle.getBucketValue(this.mouse.moveX, this.size);
 
     const leftCondition   = this.canvasObj.checkLeft(thisWasCell) && thisWasCell - cellWeleftOff   === 1;
     const topCondition    = this.canvasObj.checkTop(thisWasCell) && thisWasCell - cellWeleftOff    === this.size;
@@ -259,8 +244,8 @@ export class GamePuzzle {
       this.canvasObj.swapObject(thisWasCell, this.size);
     }
 
-    this.currCell.x = (thisWasCell % this.size) * 120;
-    this.currCell.y = Math.floor(thisWasCell / this.size) * 120;
+    this.currCell.x = (thisWasCell % this.size) * 480 / this.size;
+    this.currCell.y = Math.floor(thisWasCell / this.size) * 480 / this.size;
     this.canvasObj.redrawCanvas();
 
     document.getElementById('puzzle_canvas').removeEventListener("mouseup", this.mouseHandlerUp);
@@ -307,8 +292,17 @@ export class GamePuzzle {
 
   
 
-  static getBucketValue(x) {
-    if (x < 120) {
+  static getBucketValue(x , size) {
+    const cellWidth = 480 / size; 
+    if (x < cellWidth) {
+      return 0;
+    }
+    for (let i = cellWidth; i < 480 ; i += cellWidth) {
+      if ( x >= i && x < i + cellWidth) {
+        return i / cellWidth;
+      }
+    }
+    /*if (x < 120) {
       return 0;
     }
     if (x >= 120 && x < 240) {
@@ -319,12 +313,14 @@ export class GamePuzzle {
     }
     if (x >= 360 && x < 481) {
       return 3;
-    }
+    } */
     throw new Error("something goes wrong in GamePuzzle getBuchetY func");
   }
 
   static getBucketY(y, size) {
-    switch (GamePuzzle.getBucketValue(y)) {
+    const row = GamePuzzle.getBucketValue(y, size);
+    return row * size;
+    /* switch (GamePuzzle.getBucketValue(y, size)) {
       case 0: {
         return 0;
       }
@@ -343,7 +339,7 @@ export class GamePuzzle {
       default: {
         throw new Error("something goes wrong in GamePuzzle getBuchetY func");
       }
-    }
+    }*/
   }
   
 }

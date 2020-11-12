@@ -28,10 +28,10 @@ export class MyCanvas {
         console.log(valueArray[i * size + j]);
         let rectObj = {
           num: i + j * this.size,
-          x: i * 120,
-          y: j * 120,
-          w: 120,
-          h: 120,
+          x: i * 480 / this.size,
+          y: j * 480 / this.size,
+          w: 480 / this.size,
+          h: 480 / this.size,
           color: this.styles[MyCanvas.getRandomInt(4)],
           text: valueArray[i + j * this.size],
         }
@@ -84,7 +84,7 @@ export class MyCanvas {
   fillTextInRect(rectObj) {
     const context = this.canvas.getContext("2d");
     context.fillStyle = "#000";
-    context.fillText(rectObj.text,rectObj.x + 60, 60 + rectObj.y);
+    context.fillText(rectObj.text,rectObj.x + rectObj.w / 2, rectObj.h / 2 + rectObj.y);
   }
 
   addWinText(step, time){
@@ -245,9 +245,13 @@ export class MyCanvas {
   }
   
   checkLeft(currentCol) {
-    if ( currentCol === (0 || 1 * this.size || 2 * this.size || 3 * this.size)){
-      return false;
-    } else if (this.textDraw[currentCol - 1] === "") {
+    
+    for (let i = 0; i <  this.size; i += 1) {
+      if (currentCol === i * this.size) {
+        return false;
+      }
+    }
+    if (this.textDraw[currentCol - 1] === "") {
       return true;
     } 
     return false;
@@ -263,9 +267,12 @@ export class MyCanvas {
   }
 
   checkRight(currentCol){
-    if ( currentCol === (this.size - 1|| 2 * this.size - 1 || 3 * this.size - 1 || 4 *  this.size - 1)){
-      return false;
-    } else if (this.textDraw[currentCol + 1] === "") {
+    for (let i = 1; i <  this.size; i += 1) {
+      if (currentCol === i * this.size - 1) {
+        return false;
+      }
+    }
+    if (this.textDraw[currentCol + 1] === "") {
       return true;
     } 
     return false;
