@@ -15,7 +15,6 @@ import {
 const gamePuzzle = new GamePuzzle(canvas);
 
 window.addEventListener("load", () => {
-  console.log("hello webpack");
   initializeControlButtons();
   configurateLayout();
 });

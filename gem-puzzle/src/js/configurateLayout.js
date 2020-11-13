@@ -38,17 +38,16 @@ const buttonSettingBack = configurateButton("back");
 function configurateLayout() {
   wrapper.classList.add("wrapper");
   canvas.setAttribute("id", "puzzle_canvas");
-  canvasDiv.classList.add("canvas_div")
+  canvasDiv.classList.add("canvas_div");
   time.classList.add("time");
 
   controlButtonsDiv.classList.add("control_buttons_div");
-  // button_start.setAttribute("hidden", true);
 
   controlButtonsDiv.appendChild(buttonStart);
   controlButtonsDiv.appendChild(buttonSetting);
   controlButtonsDiv.appendChild(buttonBestScore);
 
-  canvasDiv.appendChild(time)
+  canvasDiv.appendChild(time);
   canvasDiv.appendChild(canvas);
 
   wrapper.appendChild(canvasDiv);
@@ -61,18 +60,18 @@ function updateTimeEl(newTimeContent) {
   time.innerText = newTimeContent;
 }
 
-function getTimeInnerText(){
+function getTimeInnerText() {
   return time.innerText;
 }
 
-function settingLayout(){
+function settingLayout() {
   controlButtonsDiv.innerHTML = "";
   controlButtonsDiv.appendChild(buttonSettingFieldSize);
   controlButtonsDiv.appendChild(buttomSettingVolume);
   controlButtonsDiv.appendChild(buttonSettingBack);
 }
 
-function settingFieldSize(){
+function settingFieldSize() {
   controlButtonsDiv.innerHTML = "";
   controlButtonsDiv.appendChild(buttonSettingField3x3);
   controlButtonsDiv.appendChild(buttonSettingField4x4);
@@ -97,11 +96,10 @@ function settingStartPosition() {
 }
 
 function initializeControlButtons() {
-  
   buttonSetting.addEventListener("click", () => {
     settingLayout();
   });
-  
+
   buttonSettingBack.addEventListener("click", () => {
     settingStartPosition();
   });
@@ -113,9 +111,7 @@ function initializeControlButtons() {
   buttomSettingVolume.addEventListener("click", () => {
     settingVolome();
   });
-  
 }
-
 
 module.exports = {
   configurateLayout,

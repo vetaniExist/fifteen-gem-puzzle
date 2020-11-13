@@ -12,7 +12,6 @@ import {
   getTimeInnerText,
 } from "./configurateLayout";
 
-
 export class GamePuzzle {
   constructor(canvas) {
     this.startArray = [];
@@ -29,7 +28,7 @@ export class GamePuzzle {
       y: 0,
       isDown: false,
       moveX: 0,
-      moveY:0,
+      moveY: 0,
       currCell: null,
       isClickAviable: true,
     };
@@ -40,7 +39,7 @@ export class GamePuzzle {
     this.gameWin = false;
   }
 
-  setSize(newSize){
+  setSize(newSize) {
     this.size = newSize;
   }
 
@@ -48,24 +47,24 @@ export class GamePuzzle {
     return this.size;
   }
 
-  initAudio(){
-    let audio_swipe = document.createElement("audio");
-    audio_swipe.setAttribute("src", "/src/assets/sounds/tink.wav");
-    this.audio["swipe"] = audio_swipe;
+  initAudio() {
+    const audioSwipe = document.createElement("audio");
+    audioSwipe.setAttribute("src", "/src/assets/sounds/tink.wav");
+    this.audio.swipe = audioSwipe;
   }
 
   configurateStartField() {
-    let fieldOfCellValues = [];
+    const fieldOfCellValues = [];
     this.startArray = [];
     for (let i = 1; i < this.size * this.size; i += 1) {
       fieldOfCellValues.push(i);
     }
     this.winCondition = fieldOfCellValues.slice();
-    
-    for(let i = 0; i < this.size * this.size - 1; i += 1) {
-      let randCeil = getRandomInt(fieldOfCellValues.length);
+
+    for (let i = 0; i < this.size * this.size - 1; i += 1) {
+      const randCeil = getRandomInt(fieldOfCellValues.length);
       this.startArray.push(fieldOfCellValues[randCeil]);
-      fieldOfCellValues.splice(randCeil,1)
+      fieldOfCellValues.splice(randCeil, 1);
     }
     if (this.isSolved(this.startArray)) {
       this.startArray.push("");
@@ -73,9 +72,7 @@ export class GamePuzzle {
     } else {
       console.log("restart");
       this.configurateStartField();
-      
     }
-      
   }
 
   isSolved(field) {
@@ -86,27 +83,28 @@ export class GamePuzzle {
           inversesCounter += 1;
         }
       }
-     
     }
 
     inversesCounter += this.size;
-    let isOddSize = this.size % 2;
+    const isOddSize = this.size % 2;
     if (isOddSize) {
-      return inversesCounter % 2 === 0 ? false : true;
+      return !(inversesCounter % 2 === 0);
     }
-    return inversesCounter % 2 === 0 ? true : false;
+    return inversesCounter % 2 === 0;
   }
 
   getReplacedCanvas() {
-    let el = document.getElementById('puzzle_canvas'),
-    elClone = el.cloneNode(true);
+    const el = document.getElementById("puzzle_canvas");
+    const elClone = el.cloneNode(true);
     el.parentNode.replaceChild(elClone, el);
-    return elClone;
+    this.canvas = elClone;
+    // return elClone;
   }
 
-  restart(){ 
+  restart() {
     this.startArray = [];
-    this.canvas = this.getReplacedCanvas();
+    // this.canvas = this.getReplacedCanvas();
+    this.getReplacedCanvas();
     this.canvasObj = new MyCanvas(this.canvas);
     this.canvasRect = null;
     this.stepCounter = 0;
@@ -117,7 +115,7 @@ export class GamePuzzle {
       y: 0,
       isDown: false,
       moveX: 0,
-      moveY:0,
+      moveY: 0,
       currCell: null,
       isClickAviable: true,
     };
@@ -148,7 +146,7 @@ export class GamePuzzle {
     this.stepCounter = 0;
     this.startTimer();
 
-    this.canvasObj.canvas.addEventListener("mousedown", (event) =>{
+    this.canvasObj.canvas.addEventListener("mousedown", (event) => {
       // запомнили координаты при нажатии, установили mouseMove в эту же позицию
       console.log("this.mouse");
       console.log(this.mouse);
@@ -158,38 +156,40 @@ export class GamePuzzle {
       this.mouse.moveX = this.mouse.x;
       this.mouse.moveY = this.mouse.y;
 
-      this.currCell = this.canvasObj.getRectObj(GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x, this.size));
+      this.currCell = this.canvasObj.getRectObj(GamePuzzle.getBucketY(this.mouse.y, this.size)
+      + GamePuzzle.getBucketValue(this.mouse.x, this.size));
 
       this.mouse.isDown = true;
-      
-      this.mouseHandlerUp =  this.onMouseUp.bind(this);
+
+      this.mouseHandlerUp = this.onMouseUp.bind(this);
       this.mouseHandlerMove = this.onMouseMove.bind(this);
       this.mouseHandlerLeave = this.onMouseLeave.bind(this);
 
-      document.getElementById('puzzle_canvas').addEventListener("mouseup", this.mouseHandlerUp);
-      document.getElementById('puzzle_canvas').addEventListener("mousemove", this.mouseHandlerMove);
-      document.getElementById('puzzle_canvas').addEventListener("mouseleave", this.mouseHandlerLeave);
+      document.getElementById("puzzle_canvas").addEventListener("mouseup", this.mouseHandlerUp);
+      document.getElementById("puzzle_canvas").addEventListener("mousemove", this.mouseHandlerMove);
+      document.getElementById("puzzle_canvas").addEventListener("mouseleave", this.mouseHandlerLeave);
     });
 
-    this.canvasObj.canvas.addEventListener("click", (event) => {
+    this.canvasObj.canvas.addEventListener("click", () => {
       if (this.mouse.isClickAviable && !this.gameWin) {
-        const currentBlockClick = GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x, this.size);
+        const currentBlockClick = GamePuzzle.getBucketY(this.mouse.y, this.size)
+        + GamePuzzle.getBucketValue(this.mouse.x, this.size);
         if (this.canvasObj.trySwap(currentBlockClick)) {
           this.mouse.isClickAviable = false;
           setTimeout(() => {
             this.mouse.isClickAviable = true;
           }, 480 / this.size);
-          this.audio["swipe"].play();
+          this.audio.swipe.play();
           this.stepCounter += 1;
           this.updateTime();
-          console.log("Step is correct. Count of steps = " + this.stepCounter);
+          console.log("Step is correct. Count of steps = ".concat(this.stepCounter));
           setTimeout(() => {
             if (this.canvasObj.checkWinCondition()) {
               this.canvasObj.addWinText(this.stepCounter, this.checkTime());
               this.onMouseUp();
               this.gameWin = true;
               // this.restart();
-            } 
+            }
           }, 480 / this.size);
         }
       } else {
@@ -202,7 +202,7 @@ export class GamePuzzle {
     this.canvasRect = this.canvasObj.canvas.getBoundingClientRect();
   }
 
-  onMouseLeave(event) {
+  onMouseLeave() {
     if (this.mouse.isDown && !this.gameWin) {
       this.currCell.x = this.mouse.x;
       this.currCell.y = this.mouse.y;
@@ -218,7 +218,8 @@ export class GamePuzzle {
       this.mouse.moveX = event.clientX - rect.left;
       this.mouse.moveY = event.clientY - rect.top;
 
-      if (Math.abs(this.mouse.moveX - this.mouse.x) > 25 || Math.abs(this.mouse.moveY - this.mouse.y) > 25) {
+      if (Math.abs(this.mouse.moveX - this.mouse.x) > 25
+      || Math.abs(this.mouse.moveY - this.mouse.y) > 25) {
         this.mouse.isClickAviable = false;
         console.log("Math.abs(this.mouse.moveX - this.mouse.x)");
         console.log(Math.abs(this.mouse.moveX - this.mouse.x));
@@ -228,37 +229,34 @@ export class GamePuzzle {
 
         this.currCell.x = this.mouse.moveX;
         this.currCell.y = this.mouse.moveY;
-  
+
         console.log("find cell");
         console.log(this.currCell);
         this.canvasObj.redrawCanvas(this.currCell);
-  
+
         console.log("move");
       }
     }
   }
 
-  onMouseUp(event = null){
+  onMouseUp() {
     if (!this.gameWin) {
       this.mouse.isDown = false;
 
-      const thisWasCell   = GamePuzzle.getBucketY(this.mouse.y, this.size) + GamePuzzle.getBucketValue(this.mouse.x, this.size);
-      const cellWeleftOff = GamePuzzle.getBucketY(this.mouse.moveY, this.size) + GamePuzzle.getBucketValue(this.mouse.moveX, this.size);
-  
+      const thisWasCell = GamePuzzle.getBucketY(this.mouse.y, this.size)
+      + GamePuzzle.getBucketValue(this.mouse.x, this.size);
+      const cellWeleftOff = GamePuzzle.getBucketY(this.mouse.moveY, this.size)
+      + GamePuzzle.getBucketValue(this.mouse.moveX, this.size);
+
       if (this.mouse.moveX !== this.mouse.x || this.mouse.moveY !== this.mouse.y) {
         const leftCondition   = this.canvasObj.checkLeft(thisWasCell) && thisWasCell - cellWeleftOff   === 1;
         const topCondition    = this.canvasObj.checkTop(thisWasCell) && thisWasCell - cellWeleftOff    === this.size;
         const rightCondition  = this.canvasObj.checkRight(thisWasCell) && thisWasCell - cellWeleftOff  === -1;
         const bottomCondition = this.canvasObj.checkBottom(thisWasCell) && thisWasCell - cellWeleftOff === -this.size;
         const fullCondition = leftCondition || topCondition || rightCondition || bottomCondition;
-    
-        console.log("leftCondition " + leftCondition);
-        console.log("topCondition " + topCondition);
-        console.log("rightCondition " + rightCondition);
-        console.log("bottomCondition " + bottomCondition);
-  
-        this.currCell.x = (thisWasCell % this.size) * 480 / this.size;
-        this.currCell.y = Math.floor(thisWasCell / this.size) * 480 / this.size;
+
+        this.currCell.x = ((thisWasCell % this.size) * 480) / this.size;
+        this.currCell.y = (Math.floor(thisWasCell / this.size) * 480) / this.size;
         if (fullCondition && !this.gameWin) {
           this.canvasObj.trySwap(thisWasCell);
           this.stepCounter += 1;
@@ -269,31 +267,31 @@ export class GamePuzzle {
               this.onMouseUp();
               this.gameWin = true;
               // this.restart();
-            } 
+            }
           }, 480 / this.size);
-          
         }
         this.canvasObj.redrawCanvas();
       }
-      document.getElementById('puzzle_canvas').removeEventListener("mouseup", this.mouseHandlerUp);
-      document.getElementById('puzzle_canvas').removeEventListener("mousemove", this.mouseHandlerMove);
-      document.getElementById('puzzle_canvas').removeEventListener("mouseleave", this.mouseHandlerLeave);
-  
+      document.getElementById("puzzle_canvas").removeEventListener("mouseup", this.mouseHandlerUp);
+      document.getElementById("puzzle_canvas").removeEventListener("mousemove", this.mouseHandlerMove);
+      document.getElementById("puzzle_canvas").removeEventListener("mouseleave", this.mouseHandlerLeave);
+
       this.mouseHandlerMove = null;
       this.mouseHandlerUp = null;
     }
-  };
+  }
 
   updateTime(minutes, sec) {
     if (minutes === undefined || sec === undefined) {
       const timeElInner = getTimeInnerText();
-      updateTimeEl(timeElInner.slice(0, timeElInner.length - this.stepCounter.toString(10).length).concat(this.stepCounter))
+      updateTimeEl(timeElInner.slice(0, timeElInner.length - this.stepCounter.toString(10).length).concat(this.stepCounter));
     } else {
-      updateTimeEl(formatTime(minutes).concat(" : ").concat(formatTime(sec)).concat(" step: ").concat(this.stepCounter));
+      updateTimeEl(formatTime(minutes).concat(" : ").concat(formatTime(sec)).concat(" step: ")
+        .concat(this.stepCounter));
     }
   }
 
-   startTimer() {
+  startTimer() {
     const newDate = new Date();
 
     const itTookHours = newDate.getHours() - this.today.getHours();
@@ -316,20 +314,18 @@ export class GamePuzzle {
 
     const itTookHours = newDate.getHours() - this.today.getHours();
     const itTookMinutes = newDate.getMinutes() - this.today.getMinutes() + itTookHours * 60;
-    const itTookSec =  itTookMinutes ? newDate.getSeconds() - this.today.getSeconds() : newDate.getSeconds();
+    const itTookSec = itTookMinutes ? newDate.getSeconds() - this.today.getSeconds() : newDate.getSeconds();
 
     return "it took: minutes: ".concat(formatTime(itTookMinutes)).concat(" seconds: ").concat(formatTime(itTookSec));
   }
 
-  
-
-  static getBucketValue(x , size) {
-    const cellWidth = 480 / size; 
+  static getBucketValue(x, size) {
+    const cellWidth = 480 / size;
     if (x < cellWidth) {
       return 0;
     }
-    for (let i = cellWidth; i < 480 ; i += cellWidth) {
-      if ( x >= i && x < i + cellWidth) {
+    for (let i = cellWidth; i < 480; i += cellWidth) {
+      if (x >= i && x < i + cellWidth) {
         return i / cellWidth;
       }
     }
@@ -341,7 +337,6 @@ export class GamePuzzle {
     const row = GamePuzzle.getBucketValue(y, size);
     return row * size;
   }
-  
 }
 
 export default GamePuzzle;
