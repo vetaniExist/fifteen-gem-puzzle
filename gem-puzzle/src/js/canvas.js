@@ -12,8 +12,22 @@ export class MyCanvas {
     return Math.floor(Math.random() * Math.floor(newMax));
   }
 
-  initBasicField(valueArray, size, winCondition) {
-    this.rectObjects = [];
+  getRectObjects() {
+    return this.rectObjects;
+  }
+
+  setRectObjects(newRectObjects) {
+    console.log("get this obj");
+    console.log(newRectObjects);
+    this.rectObjects = newRectObjects;
+    console.log("after setter ");
+    console.log(this.rectObjects);
+  }
+
+  initBasicField(valueArray, size, winCondition, isLoad = false) {
+    if (!isLoad) {
+      this.rectObjects = [];
+    }
     this.size = size;
     this.winConditionArray = winCondition;
     this.textDraw = valueArray;
@@ -24,21 +38,29 @@ export class MyCanvas {
 
     for (let i = 0; i < size; i += 1) {
       for (let j = 0; j < size; j += 1) {
-        const rectObj = {
-          num: i + j * this.size,
-          x: (i * 480) / this.size,
-          y: (j * 480) / this.size,
-          w: 480 / this.size,
-          h: 480 / this.size,
-          color: this.styles[MyCanvas.getRandomInt(4)],
-          text: valueArray[i + j * this.size],
-        };
+        if (!isLoad) {
+          const rectObj = {
+            num: i + j * this.size,
+            x: (i * 480) / this.size,
+            y: (j * 480) / this.size,
+            w: 480 / this.size,
+            h: 480 / this.size,
+            color: this.styles[MyCanvas.getRandomInt(4)],
+            text: valueArray[i + j * this.size],
+          };
+  
+          this.rectObjects[i + j * this.size] = (rectObj);
 
-        this.rectObjects[i + j * this.size] = (rectObj);
-
-        this.drawRect(rectObj);
-        this.strokeRect(rectObj);
-        this.fillTextInRect(rectObj);
+          this.drawRect(rectObj);
+          this.strokeRect(rectObj);
+          this.fillTextInRect(rectObj);
+        } else {
+          console.log("init this field");
+          console.log(this.rectObjects)
+          this.drawRect(this.rectObjects[i + j * this.size]);
+          this.strokeRect(this.rectObjects[i + j * this.size]);
+          this.fillTextInRect(this.rectObjects[i + j * this.size]);
+        }
       }
     }
     console.log("start: ");

@@ -2,6 +2,7 @@ import {
   configurateLayout,
   canvas,
   buttonStart,
+  buttonLoadLastGame,
   buttonSettingField3x3,
   buttonSettingField4x4,
   buttonSettingField8x8,
@@ -21,6 +22,10 @@ window.addEventListener("load", () => {
 
 buttonStart.addEventListener("click", () => {
   gamePuzzle.start();
+});
+
+buttonLoadLastGame.addEventListener("click", () => {
+  gamePuzzle.loadGame();
 });
 
 buttonSettingField3x3.addEventListener("click", () => {

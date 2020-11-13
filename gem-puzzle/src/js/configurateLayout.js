@@ -20,6 +20,7 @@ const canvas = createEl("canvas");
 const controlButtonsDiv = createEl("div");
 
 const buttonStart = configurateButton("start");
+const buttonLoad = configurateButton("load");
 const buttonSetting = configurateButton("setting");
 const buttonBestScore = configurateButton("best score");
 
@@ -33,6 +34,8 @@ const buttonSettingField8x8 = configurateButton("8x8");
 const buttonSettingVolumeUp = configurateButton("volume up");
 const buttonSettingVolumeDown = configurateButton("volume down");
 
+const buttonLoadLastGame = configurateButton("last game");
+
 const buttonSettingBack = configurateButton("back");
 
 function configurateLayout() {
@@ -44,6 +47,7 @@ function configurateLayout() {
   controlButtonsDiv.classList.add("control_buttons_div");
 
   controlButtonsDiv.appendChild(buttonStart);
+  controlButtonsDiv.appendChild(buttonLoad);
   controlButtonsDiv.appendChild(buttonSetting);
   controlButtonsDiv.appendChild(buttonBestScore);
 
@@ -95,6 +99,12 @@ function settingStartPosition() {
   controlButtonsDiv.appendChild(buttonBestScore);
 }
 
+function onButtonLoad() {
+  controlButtonsDiv.innerHTML = "";
+  controlButtonsDiv.appendChild(buttonLoadLastGame);
+  controlButtonsDiv.appendChild(buttonSettingBack);
+}
+
 function initializeControlButtons() {
   buttonSetting.addEventListener("click", () => {
     settingLayout();
@@ -111,12 +121,17 @@ function initializeControlButtons() {
   buttomSettingVolume.addEventListener("click", () => {
     settingVolome();
   });
+
+  buttonLoad.addEventListener("click", () => {
+    onButtonLoad();
+  });
 }
 
 module.exports = {
   configurateLayout,
   canvas,
   buttonStart,
+  buttonLoadLastGame,
   buttonSettingField3x3,
   buttonSettingField4x4,
   buttonSettingField8x8,

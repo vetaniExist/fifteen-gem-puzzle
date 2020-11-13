@@ -139,11 +139,14 @@ export class GamePuzzle {
 
     console.log("start with this winCondition:");
     console.log(this.winCondition);
-
+    this.stepCounter = 0;
     this.canvasObj.initBasicField(this.startArray, this.size, this.winCondition);
+    this.startGame();
+  }
+
+  startGame() {
     this.getCanvasRect();
     this.today = new Date();
-    this.stepCounter = 0;
     this.startTimer();
 
     this.canvasObj.canvas.addEventListener("mousedown", (event) => {
@@ -175,6 +178,7 @@ export class GamePuzzle {
         const currentBlockClick = GamePuzzle.getBucketY(this.mouse.y, this.size)
         + GamePuzzle.getBucketValue(this.mouse.x, this.size);
         if (this.canvasObj.trySwap(currentBlockClick)) {
+          console.log("клик рабоатет");
           this.mouse.isClickAviable = false;
           setTimeout(() => {
             this.mouse.isClickAviable = true;
@@ -189,6 +193,8 @@ export class GamePuzzle {
               this.onMouseUp();
               this.gameWin = true;
               // this.restart();
+            } else {
+              this.saveGame();
             }
           }, 480 / this.size);
         }
@@ -267,6 +273,8 @@ export class GamePuzzle {
               this.onMouseUp();
               this.gameWin = true;
               // this.restart();
+            } else {
+              this.saveGame();
             }
           }, 480 / this.size);
         }
@@ -317,6 +325,40 @@ export class GamePuzzle {
     const itTookSec = itTookMinutes ? newDate.getSeconds() - this.today.getSeconds() : newDate.getSeconds();
 
     return "it took: minutes: ".concat(formatTime(itTookMinutes)).concat(" seconds: ").concat(formatTime(itTookSec));
+  }
+
+  saveGame() {
+    console.log("saveGame func");
+    const canvasObjField = this.canvasObj.getRectObjects();
+    const gamePuzzleCurrentGame = {
+      canvasField : canvasObjField,
+      winCondition : this.winCondition,
+      step : this.stepCounter,
+      size : this.size,
+      startArray: this.startArray,
+    }
+    // canvasObjField.push(timeStep);
+    localStorage.setItem("vetaniExistGamePuzzleCurrentGame", JSON.stringify(gamePuzzleCurrentGame));
+    console.log(localStorage.getItem("vetaniExistGamePuzzleCurrentGame"));
+  }
+
+  loadGame() {
+    const gamePuzzleCurrentGame = JSON.parse(localStorage.getItem("vetaniExistGamePuzzleCurrentGame"));
+    if (gamePuzzleCurrentGame === "null") {
+      return false;
+    }
+    this.canvasObj.setRectObjects(gamePuzzleCurrentGame.canvasField);
+    this.winCondition = gamePuzzleCurrentGame.winCondition;
+    this.size = gamePuzzleCurrentGame.size;
+    this.stepCounter = gamePuzzleCurrentGame.step;
+    const startArray = gamePuzzleCurrentGame.startArray;
+
+    console.log("проверка");
+    console.log(this.canvasObj.getRectObjects());
+    console.log(gamePuzzleCurrentGame.canvasField);
+    this.initAudio();
+    this.canvasObj.initBasicField(startArray, this.size, this.winCondition, true);
+    this.startGame();
   }
 
   static getBucketValue(x, size) {
