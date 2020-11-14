@@ -22,6 +22,7 @@ const controlButtonsDiv = createEl("div");
 const buttonStart = configurateButton("start");
 const buttonLoad = configurateButton("load");
 const buttonSetting = configurateButton("setting");
+const buttonAutoSolvation = configurateButton("auto solvation");
 const buttonBestScore = configurateButton("best score");
 
 const buttonSettingFieldSize = configurateButton("field size");
@@ -48,6 +49,7 @@ function configurateLayout() {
 
   controlButtonsDiv.appendChild(buttonStart);
   controlButtonsDiv.appendChild(buttonLoad);
+  controlButtonsDiv.appendChild(buttonAutoSolvation);
   controlButtonsDiv.appendChild(buttonSetting);
   controlButtonsDiv.appendChild(buttonBestScore);
 
@@ -96,6 +98,7 @@ function settingStartPosition() {
   controlButtonsDiv.innerHTML = "";
   controlButtonsDiv.appendChild(buttonStart);
   controlButtonsDiv.appendChild(buttonSetting);
+  controlButtonsDiv.appendChild(buttonAutoSolvation);
   controlButtonsDiv.appendChild(buttonBestScore);
 }
 
@@ -131,6 +134,7 @@ module.exports = {
   configurateLayout,
   canvas,
   buttonStart,
+  buttonAutoSolvation,
   buttonLoadLastGame,
   buttonSettingField3x3,
   buttonSettingField4x4,

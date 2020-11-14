@@ -63,8 +63,8 @@ export class MyCanvas {
         }
       }
     }
-    console.log("start: ");
-    console.log(this.rectObjects);
+    // console.log("start: ");
+    // console.log(this.rectObjects);
   }
 
   redrawCanvas(managedObject = null) {
@@ -297,7 +297,7 @@ export class MyCanvas {
   }
 
   checkRight(currentCol) {
-    for (let i = 1; i < this.size; i += 1) {
+    for (let i = 1; i <= this.size; i += 1) {
       if (currentCol === i * this.size - 1) {
         return false;
       }

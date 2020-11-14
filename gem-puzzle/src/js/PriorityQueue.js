@@ -73,13 +73,17 @@ export class PriorityQueue {
 
   isEmpty() {
     // return true if the queue is empty.
-    return this.items.length === 0;
+    return this.length === 0;
+  }
+
+  length() {
+    return this.items.length;
   }
 
   printPQueue() {
-    const str = "";
+    let str = "";
     for (let i = 0; i < this.items.length; i += 1) {
-      str.concat(this.items[i].element).concat(" ");
+      str += ((JSON.stringify(this.items[i].element)).concat("\n\n\n\n\n"));
     }
     return str;
   }

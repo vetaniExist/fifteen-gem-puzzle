@@ -2,6 +2,7 @@ import {
   configurateLayout,
   canvas,
   buttonStart,
+  buttonAutoSolvation,
   buttonLoadLastGame,
   buttonSettingField3x3,
   buttonSettingField4x4,
@@ -26,6 +27,10 @@ buttonStart.addEventListener("click", () => {
 
 buttonLoadLastGame.addEventListener("click", () => {
   gamePuzzle.loadGame();
+});
+
+buttonAutoSolvation.addEventListener("click", () => {
+  gamePuzzle.autoSolvation();
 });
 
 buttonSettingField3x3.addEventListener("click", () => {
