@@ -470,6 +470,7 @@ export class GamePuzzle {
     console.log("currentMinState");
 
     console.log(currentMinState);
+    this.getSolvePath(currentMinState);
   }
 
   checkInVisitedArray(visited, field){
@@ -586,20 +587,32 @@ export class GamePuzzle {
   }
 
   getSolvePath(node) {
-    if (node.prev !== null) {
-      this.getSolvePath(node.prev);
-      let prevField = node.prev.field;
-      console.log(this.getDifference(node.field, prevField))
+    const cellSize = 480 / this.size;
+    const steps = [];
+    while (node.prev !== null) {
+      const prevField = node.prev.field;
+      steps.unshift(this.getDifference(node.field, prevField));
+      node = node.prev;
+    }
+ 
+    for (let i = 0; i < steps.length; i += 1) {
+      setTimeout(() => {
+        const cellNum = this.canvasObj.getRectObjNumByValue(steps[i]);
+        this.canvasObj.trySwap(cellNum);
+      }, i * cellSize + 300 * i);
     }
   }
 
   getDifference(curField, prevField) {
     console.log("getDifference");
     for (let i = 0; i < curField.length; i += 1) {
-      
+
       if (curField[i].text !== prevField[i].text) {
-        
-        return prevField[i].text + " => " + curField[i].text;
+        if (prevField[i].text === "") {
+          return curField[i].text;
+        } else {
+          return prevField[i].text;
+        }
       }
     }
 

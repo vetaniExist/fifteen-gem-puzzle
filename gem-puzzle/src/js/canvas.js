@@ -171,6 +171,15 @@ export class MyCanvas {
     return this.rectObjects[currentCol];
   }
 
+  getRectObjNumByValue(value) {
+    for( let i = 0; i < this.rectObjects.length; i += 1) {
+      if (this.rectObjects[i].text === value) {
+        return i;
+      }
+    }
+    // return 
+  }
+
   swapObjectProperties(currentCol, stepInArray) {
     const rectObjCur = this.getRectObj(currentCol);
     const rectObjPrev = this.getRectObj(currentCol + stepInArray);
@@ -239,11 +248,11 @@ export class MyCanvas {
         this.strokeRect(rectObjCur);
         this.fillTextInRect(rectObjCur);
         if (i === rectObjCur.w - 1) {
-          console.log("after: ");
-          console.log(this.rectObjects);
+          // console.log("after: ");
+          // console.log(this.rectObjects);
           this.swapObjectProperties(currentCol, stepInArray);
-          console.log("after2: ");
-          console.log(this.rectObjects);
+          // console.log("after2: ");
+          // console.log(this.rectObjects);
         }
       }, 1 * i);
     }
