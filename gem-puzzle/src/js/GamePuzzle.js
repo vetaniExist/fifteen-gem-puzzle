@@ -388,11 +388,7 @@ export class GamePuzzle {
     priorityQueue.enqueue(startNode, startNode.g + startNode.h);
     visited.push(startNode.field);
 
-    const MAX_ITER = this.factorial(this.size * this.size);
     let iter = 0;
-    console.log("factorial = ");
-    console.log(MAX_ITER);
-
     let currentMinState = {...startNode};
 
     while(priorityQueue.length() !== 0) {
@@ -400,10 +396,9 @@ export class GamePuzzle {
         break;
       }
       iter++
+
       const priorityQueueItem = priorityQueue.dequeue();
       const currentNode = priorityQueueItem.element;
-      console.log(currentNode);
-      console.log("priority: " + priorityQueueItem.priority);
 
       // Проверяем детей слева
       if (currentNode.leftCell !== null) {
@@ -413,9 +408,7 @@ export class GamePuzzle {
           visited.push(leftChild.field);
           if (leftChild.h < currentMinState.h) {
             currentMinState = {...leftChild};
-          } else if (leftChild.g < currentMinState.g && leftChild.h === currentMinState.h){
-            currentMinState = {...leftChild};
-          }
+          } 
           if(currentMinState.h === 0) {
             break;
           }
@@ -468,40 +461,21 @@ export class GamePuzzle {
         if(currentMinState.h === 0) {
           break;
         }
-      } 
-
-      // Проверим детей сверху
+      }
     }
+
+    console.log("iter = " + iter);
+
 
     console.log("currentMinState");
 
     console.log(currentMinState);
-
-    // this.getSolvePath(currentMinState);
-
-    /* console.log(originalField);
-    console.log(typeof originalField);
-    console.log(this.canvasObj.getRectObjects()); 
-
-    console.log("startNode");
-    // console.log(startNode);
-    console.log(this.checkInVisitedArray(visited, startNode.field));
-    
-    console.log("left child");
-    const leftChild = this.getNode(startNode, -1);
-    // console.log(leftChild.field);
-    console.log(this.checkInVisitedArray(visited, leftChild.field));
-
-    console.log("left child2");
-    const leftChild2 = this.getNode(leftChild, -1);
-    // console.log(leftChild2.field)
-    console.log(this.checkInVisitedArray(visited, leftChild2.field));*/
-
-    // console.log(visited);
   }
 
   checkInVisitedArray(visited, field){
+    //console.log(visited);
     for (let i = 0; i < visited.length; i += 1) {
+
       for(let j = 0; j < visited[i].length; j += 1) {
         if (visited[i][j] !== field[j]) {
           break;
@@ -602,6 +576,7 @@ export class GamePuzzle {
     }
     return counterOfInconsistency;
   }
+  
 
   getDistanse(ansestor) {
     if (ansestor.prev !== null) {
@@ -628,13 +603,6 @@ export class GamePuzzle {
       }
     }
 
-  }
-
-  factorial(n) {
-    if (n < 2) {
-      return 1;
-    }
-    return n * this.factorial(n - 1);
   }
 
   static getBucketValue(x, size) {
