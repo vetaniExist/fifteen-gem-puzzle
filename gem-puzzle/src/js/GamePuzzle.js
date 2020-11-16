@@ -10,14 +10,16 @@ import {
 import {
   updateTimeEl,
   getTimeInnerText,
-  deployPopup,
-  hidePopup,
   popupDiv,
 } from "./configurateLayout";
 
 import {
   PriorityQueue,
 } from "./PriorityQueue";
+
+import {
+  Timer,
+} from "./timer";
 
 export class GamePuzzle {
   constructor(canvas) {
@@ -48,6 +50,7 @@ export class GamePuzzle {
     this.mouseHandlerMove = null;
     this.mouseHandlerLeave = null;
     this.timer = null;
+    this.cTimer = new Timer();
     this.gameWin = false;
 
     this.initAudio();
@@ -174,6 +177,9 @@ export class GamePuzzle {
     this.mouseHandlerMove = null;
     this.mouseHandlerLeave = null;
     this.gameWin = false;
+    this.timer = null;
+    this.cTimer.restart();
+    this.cTimer = new Timer();
   }
 
   start() {
@@ -184,13 +190,14 @@ export class GamePuzzle {
     this.configurateStartField();
     this.stepCounter = 0;
     this.canvasObj.initBasicField(this.startArray, this.size, this.winCondition);
+    this.cTimer.startTimer();
     this.startGame();
   }
 
   startGame() {
     this.getCanvasRect();
     this.today = new Date();
-    this.startTimer();
+    this.updateTime();
 
     this.canvasObj.canvas.addEventListener("mousedown", (event) => {
       // запомнили координаты при нажатии, установили mouseMove в эту же позицию
@@ -229,10 +236,10 @@ export class GamePuzzle {
           this.updateTime();
           setTimeout(() => {
             if (this.canvasObj.checkWinCondition()) {
+              this.cTimer.stop();
               this.canvasObj.addWinText(this.stepCounter, this.checkTime());
               this.onMouseUp();
               this.gameWin = true;
-              // this.restart();
             } else {
               this.saveGame();
             }
@@ -323,48 +330,15 @@ export class GamePuzzle {
     }
   }
 
-  updateTime(minutes, sec) {
-    if (minutes === undefined || sec === undefined) {
-      const timeElInner = getTimeInnerText();
-      updateTimeEl(timeElInner.slice(0, timeElInner.length - this.stepCounter.toString(10).length)
-        .concat(this.stepCounter));
-    } else {
-      updateTimeEl(formatTime(minutes).concat(" : ").concat(formatTime(sec)).concat(" step: ")
-        .concat(this.stepCounter));
-    }
-  }
-
-  startTimer() {
-    const newDate = new Date();
-
-    const itTookHours = newDate.getHours() - this.today.getHours();
-    const itTookMinutes = newDate.getMinutes() - this.today.getMinutes() + itTookHours * 60;
-    let itTookSec;
-    if (itTookMinutes) {
-      itTookSec = newDate.getSeconds();
-    } else {
-      itTookSec = newDate.getSeconds() - this.today.getSeconds();
-    }
-    if (!this.gameWin) {
-      this.updateTime(itTookMinutes, itTookSec);
-      this.timer = this.startTimer.bind(this);
-      setTimeout(this.timer, 1000);
-    }
+  updateTime() {
+    const timeElInner = getTimeInnerText().slice(0, 7);
+    const stepString = " steps: " + this.stepCounter;
+    updateTimeEl(timeElInner.concat(stepString));
   }
 
   checkTime() {
-    const newDate = new Date();
-
-    const itTookHours = newDate.getHours() - this.today.getHours();
-    const itTookMinutes = newDate.getMinutes() - this.today.getMinutes() + itTookHours * 60;
-    let itTookSec;
-    if (itTookMinutes) {
-      itTookSec = newDate.getSeconds();
-    } else {
-      itTookSec = newDate.getSeconds() - this.today.getSeconds();
-    }
-    // const itTookSec = itTookMinutes ? newDate.getSeconds() - this.today.getSeconds() : newDate.getSeconds();
-
+    const itTookMinutes = this.cTimer.getMinutes();
+    const itTookSec = this.cTimer.getSeconds();
     return "it took: minutes: ".concat(formatTime(itTookMinutes)).concat(" seconds: ").concat(formatTime(itTookSec));
   }
 
@@ -377,7 +351,7 @@ export class GamePuzzle {
       size: this.size,
       startArray: this.startArray,
     };
-    // canvasObjField.push(timeStep);
+    // canvasObjField.push(time);
     localStorage.setItem("vetaniExistGamePuzzleCurrentGame", JSON.stringify(gamePuzzleCurrentGame));
   }
 
@@ -404,11 +378,11 @@ export class GamePuzzle {
     setTimeout(() => {
       this.gameWin = true;
       const originalField = (this.canvasObj.getRectObjects()).slice();
-  
+
       const emptyCellNum = GamePuzzle.getEmptyCellIndex(originalField);
       const priorityQueue = new PriorityQueue();
       const visited = [];
-  
+
       const startNode = {
         field: originalField,
         leftCell: this.getLeftNeighbor(emptyCellNum),
@@ -419,22 +393,22 @@ export class GamePuzzle {
         h: this.calculateH(originalField),
         g: 0,
       };
-  
+
       priorityQueue.enqueue(startNode, startNode.g + startNode.h);
       visited.push(startNode.field);
-  
+
       let iter = 0;
       let currentMinState = { ...startNode };
-  
+
       while (priorityQueue.length() !== 0) {
         if (iter >= 50000) {
           break;
         }
         iter += 1;
-  
+
         const priorityQueueItem = priorityQueue.dequeue();
         const currentNode = priorityQueueItem.element;
-  
+
         // Проверяем детей слева
         if (currentNode.leftCell !== null) {
           const leftChild = this.getNode(currentNode, -1);
@@ -449,11 +423,11 @@ export class GamePuzzle {
             }
           }
         }
-  
+
         // Проверим детей справа
         if (currentNode.rightCell !== null) {
           const rightChild = this.getNode(currentNode, 1);
-  
+
           if (!GamePuzzle.checkInVisitedArray(visited, rightChild.field)) {
             priorityQueue.enqueue(rightChild, rightChild.h);
             visited.push(rightChild.field);
@@ -465,11 +439,11 @@ export class GamePuzzle {
             }
           }
         }
-  
+
         // Проверим детей сверху
         if (currentNode.topCell !== null) {
           const topChild = this.getNode(currentNode, -this.size);
-  
+
           if (!GamePuzzle.checkInVisitedArray(visited, topChild.field)) {
             priorityQueue.enqueue(topChild, topChild.h);
             visited.push(topChild.field);
@@ -481,11 +455,11 @@ export class GamePuzzle {
             break;
           }
         }
-  
+
         // Проверим детей снизу
         if (currentNode.bottomCell !== null) {
           const bottomChild = this.getNode(currentNode, this.size);
-  
+
           if (!GamePuzzle.checkInVisitedArray(visited, bottomChild.field)) {
             priorityQueue.enqueue(bottomChild, bottomChild.h);
             visited.push(bottomChild.field);
