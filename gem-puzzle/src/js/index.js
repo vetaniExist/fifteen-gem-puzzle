@@ -9,6 +9,10 @@ import {
   buttonSettingField8x8,
   initializeControlButtons,
   buttonForImages,
+  buttonSettingVolumeOnOf,
+  buttonSettingVolumeOnOfSwitch,
+  buttonSettingVolumeDown,
+  buttonSettingVolumeUp,
 } from "./configurateLayout";
 
 import {
@@ -51,4 +55,18 @@ buttonSettingField8x8.addEventListener("click", () => {
 
 buttonForImages.addEventListener("click", () => {
   gamePuzzle.addImageOnBoard();
+});
+
+buttonSettingVolumeOnOf.addEventListener("click", () => {
+  buttonSettingVolumeOnOfSwitch( gamePuzzle.audioOnOf());
+});
+
+
+buttonSettingVolumeDown.addEventListener("click", () => {
+  buttonSettingVolumeOnOfSwitch(gamePuzzle.audioVolumeDown());
+  
+});
+
+buttonSettingVolumeUp.addEventListener("click", () => {
+  buttonSettingVolumeOnOfSwitch(gamePuzzle.audioVolumeUp());
 });

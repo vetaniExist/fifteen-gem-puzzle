@@ -35,6 +35,7 @@ const buttonSettingField8x8 = configurateButton("8x8");
 
 const buttonSettingVolumeUp = configurateButton("volume up");
 const buttonSettingVolumeDown = configurateButton("volume down");
+const buttonSettingVolumeOnOf = configurateButton("volume: on");
 
 const buttonLoadLastGame = configurateButton("last game");
 
@@ -94,22 +95,30 @@ function settingVolome() {
   controlButtonsDiv.innerHTML = "";
   controlButtonsDiv.appendChild(buttonSettingVolumeUp);
   controlButtonsDiv.appendChild(buttonSettingVolumeDown);
+  controlButtonsDiv.appendChild(buttonSettingVolumeOnOf);
 
   controlButtonsDiv.appendChild(buttonSetting);
 }
 
 function settingStartPosition() {
   controlButtonsDiv.innerHTML = "";
+
   controlButtonsDiv.appendChild(buttonStart);
-  controlButtonsDiv.appendChild(buttonSetting);
+  controlButtonsDiv.appendChild(buttonLoad);
   controlButtonsDiv.appendChild(buttonAutoSolvation);
+  controlButtonsDiv.appendChild(buttonSetting);
   controlButtonsDiv.appendChild(buttonBestScore);
+  controlButtonsDiv.appendChild(buttonForImages);
 }
 
 function onButtonLoad() {
   controlButtonsDiv.innerHTML = "";
   controlButtonsDiv.appendChild(buttonLoadLastGame);
   controlButtonsDiv.appendChild(buttonSettingBack);
+}
+
+function buttonSettingVolumeOnOfSwitch(isOn){
+  isOn ? buttonSettingVolumeOnOf.innerText = "volume: on" : buttonSettingVolumeOnOf.innerText = "volume: of";
 }
 
 function initializeControlButtons() {
@@ -147,4 +156,8 @@ module.exports = {
   getTimeInnerText,
   initializeControlButtons,
   buttonForImages,
+  buttonSettingVolumeOnOf,
+  buttonSettingVolumeOnOfSwitch,
+  buttonSettingVolumeDown,
+  buttonSettingVolumeUp,
 };

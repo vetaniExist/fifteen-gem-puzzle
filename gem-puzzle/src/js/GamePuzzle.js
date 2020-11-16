@@ -25,8 +25,13 @@ export class GamePuzzle {
     this.canvasRect = null;
     this.stepCounter = 0;
     this.today = null;
-    this.size = 4;
-    this.audio = [];
+    this.size = 3;
+    this.audio = {
+      sounds: [],
+      volume: 0.1,
+      isAviable: true,
+    };
+
     this.mouse = {
       x: 0,
       y: 0,
@@ -41,6 +46,8 @@ export class GamePuzzle {
     this.mouseHandlerLeave = null;
     this.timer = null;
     this.gameWin = false;
+
+    this.initAudio();
   }
 
   setSize(newSize) {
@@ -54,7 +61,47 @@ export class GamePuzzle {
   initAudio() {
     const audioSwipe = document.createElement("audio");
     audioSwipe.setAttribute("src", "/src/assets/sounds/tink.wav");
-    this.audio.swipe = audioSwipe;
+    this.audio.sounds.swipe = audioSwipe;
+    this.audio.volume = this.audio.volume ? this.audio.volume : 0.2;
+  }
+
+  playAudio() {
+    // this.audio.sounds.swipe.currentTime = 0;
+    if (this.audio.isAviable) {
+      this.audio.sounds.swipe.volume = this.audio.volume;
+      this.audio.sounds.swipe.play();
+    }
+  }
+
+  audioVolumeUp() {
+    if (this.audio.volume < 1) {
+      this.audio.volume += 0.1;
+      if (this.audio.volume > 1) {
+        this.audio.volume = 1;
+      }
+    }
+    this.audio.isAviable = true;
+    return this.audio.volume > 0;
+  }
+
+  audioVolumeDown() {
+    if (this.audio.volume > 0) {
+      this.audio.volume -= 0.1;
+      if (this.audio.volume < 0) {
+        this.audio.volume = 0;
+      }
+    }
+    if (this.audio.volume) {
+      this.audio.isAviable = true;
+    } else {
+      this.audio.isAviable = false;
+    }
+    return this.audio.volume > 0;
+  }
+
+  audioOnOf() {
+    this.audio.isAviable = !this.audio.isAviable;
+    return this.audio.isAviable;
   }
 
   configurateStartField() {
@@ -112,7 +159,11 @@ export class GamePuzzle {
     this.canvasRect = null;
     this.stepCounter = 0;
     this.today = null;
-    this.audio = [];
+    this.audio = {
+      sounds: [],
+      volume: 0.1,
+      isAviable: true,
+    }
     this.mouse = {
       x: 0,
       y: 0,
@@ -133,7 +184,6 @@ export class GamePuzzle {
       this.restart();
     }
 
-    this.initAudio();
     this.configurateStartField();
     this.stepCounter = 0;
     this.canvasObj.initBasicField(this.startArray, this.size, this.winCondition);
@@ -176,7 +226,8 @@ export class GamePuzzle {
           setTimeout(() => {
             this.mouse.isClickAviable = true;
           }, 480 / this.size);
-          this.audio.swipe.play();
+          this.playAudio();
+          // this.audio.swipe.play();
           this.stepCounter += 1;
           this.updateTime();
           setTimeout(() => {
@@ -335,7 +386,7 @@ export class GamePuzzle {
       this.size = gamePuzzleCurrentGame.size;
       this.stepCounter = gamePuzzleCurrentGame.step;
 
-      this.initAudio();
+      // this.initAudio();
       this.canvasObj.initBasicField(gamePuzzleCurrentGame.startArray, this.size, this.winCondition, true);
       this.startGame();
     }
@@ -551,7 +602,7 @@ export class GamePuzzle {
   }
 
   getSolvePath(node) {
-    const cellSize = 480 / this.size;
+    const cellSize = this.canvasObj.canvas.width / this.size;
     const steps = [];
     let curNode = node;
     while (curNode.prev !== null) {
@@ -565,6 +616,7 @@ export class GamePuzzle {
       setTimeout(() => {
         const cellNum = this.canvasObj.getRectObjNumByValue(steps[i]);
         this.canvasObj.trySwap(cellNum);
+        console.log(cellSize);
       }, i * cellSize + 300 * i);
     }
   }
