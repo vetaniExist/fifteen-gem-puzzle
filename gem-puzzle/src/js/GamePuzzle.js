@@ -5,6 +5,7 @@ import {
 import {
   getRandomInt,
   formatTime,
+  getRandomImage,
 } from "./utils";
 
 import {
@@ -164,8 +165,8 @@ export class GamePuzzle {
       this.mouse.moveX = this.mouse.x;
       this.mouse.moveY = this.mouse.y;
 
-      this.currCell = this.canvasObj.getRectObj(GamePuzzle.getBucketY(this.mouse.y, this.size)
-        + GamePuzzle.getBucketValue(this.mouse.x, this.size));
+      this.currCell = this.canvasObj.getRectObj(this.getBucketY(this.mouse.y)
+        + this.getBucketValue(this.mouse.x));
 
       this.mouse.isDown = true;
 
@@ -180,8 +181,8 @@ export class GamePuzzle {
 
     this.canvasObj.canvas.addEventListener("click", () => {
       if (this.mouse.isClickAviable && !this.gameWin) {
-        const currentBlockClick = GamePuzzle.getBucketY(this.mouse.y, this.size)
-          + GamePuzzle.getBucketValue(this.mouse.x, this.size);
+        const currentBlockClick = this.getBucketY(this.mouse.y)
+          + this.getBucketValue(this.mouse.x);
         if (this.canvasObj.trySwap(currentBlockClick)) {
           console.log("клик рабоатет");
           this.mouse.isClickAviable = false;
@@ -254,10 +255,10 @@ export class GamePuzzle {
     if (!this.gameWin) {
       this.mouse.isDown = false;
 
-      const thisWasCell = GamePuzzle.getBucketY(this.mouse.y, this.size)
-        + GamePuzzle.getBucketValue(this.mouse.x, this.size);
-      const cellWeleftOff = GamePuzzle.getBucketY(this.mouse.moveY, this.size)
-        + GamePuzzle.getBucketValue(this.mouse.moveX, this.size);
+      const thisWasCell = this.getBucketY(this.mouse.y)
+        + this.getBucketValue(this.mouse.x);
+      const cellWeleftOff = this.getBucketY(this.mouse.moveY)
+        + this.getBucketValue(this.mouse.moveX);
 
       if (this.mouse.moveX !== this.mouse.x || this.mouse.moveY !== this.mouse.y) {
         const leftCondition = this.canvasObj.checkLeft(thisWasCell) && thisWasCell - cellWeleftOff === 1;
@@ -615,11 +616,10 @@ export class GamePuzzle {
         }
       }
     }
-
   }
 
-  static getBucketValue(x, size) {
-    const cellWidth = 480 / size;
+  getBucketValue(x) {
+    const cellWidth = 480 / this.size;
     if (x < cellWidth) {
       return 0;
     }
@@ -632,9 +632,15 @@ export class GamePuzzle {
     throw new Error("something goes wrong in GamePuzzle getBuchetY func");
   }
 
-  static getBucketY(y, size) {
-    const row = GamePuzzle.getBucketValue(y, size);
-    return row * size;
+  getBucketY(y) {
+    const row = this.getBucketValue(y, this.size);
+    return row * this.size;
+  }
+
+  addImageOnBoard() {
+    console.log("testFunc");  
+    this.canvasObj.setImage();
+
   }
 }
 

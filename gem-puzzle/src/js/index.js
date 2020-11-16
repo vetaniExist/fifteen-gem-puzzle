@@ -8,6 +8,7 @@ import {
   buttonSettingField4x4,
   buttonSettingField8x8,
   initializeControlButtons,
+  buttonForImages,
 } from "./configurateLayout";
 
 import {
@@ -46,4 +47,8 @@ buttonSettingField4x4.addEventListener("click", () => {
 buttonSettingField8x8.addEventListener("click", () => {
   gamePuzzle.setSize(8);
   gamePuzzle.start();
+});
+
+buttonForImages.addEventListener("click", () => {
+  gamePuzzle.addImageOnBoard();
 });

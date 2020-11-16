@@ -1,3 +1,5 @@
+import { getRandomImage } from "./utils";
+
 export class MyCanvas {
   constructor(canvas) {
     this.canvas = canvas;
@@ -6,6 +8,9 @@ export class MyCanvas {
     this.winConditionArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, ""];
     this.rectObjects = [];
     this.size = null;
+    this.images = [];
+    this.image = null;
+    this.canvasInnerWidthHeightCoef = 1;
   }
 
   static getRandomInt(newMax) {
@@ -47,6 +52,7 @@ export class MyCanvas {
             h: 480 / this.size,
             color: this.styles[MyCanvas.getRandomInt(4)],
             text: valueArray[i + j * this.size],
+            image: null,
           };
   
           this.rectObjects[i + j * this.size] = (rectObj);
@@ -63,8 +69,6 @@ export class MyCanvas {
         }
       }
     }
-    // console.log("start: ");
-    // console.log(this.rectObjects);
   }
 
   redrawCanvas(managedObject = null) {
@@ -76,14 +80,14 @@ export class MyCanvas {
         if (!(managedObject !== null && managedObject === rectObj)) {
           this.drawRect(rectObj);
           this.strokeRect(rectObj);
-          this.fillTextInRect(rectObj);
+          // this.fillTextInRect(rectObj);
         }
       }
     }
     if (managedObject !== null) {
       this.drawRect(managedObject);
       this.strokeRect(managedObject);
-      this.fillTextInRect(managedObject);
+      // this.fillTextInRect(managedObject);
     }
   }
 
@@ -95,10 +99,37 @@ export class MyCanvas {
 
   drawRect(rectObj) {
     const context = this.canvas.getContext("2d");
-    context.fillStyle = "rgba(0,0,0,0)";
-    context.clearRect(rectObj.x, rectObj.y, rectObj.w, rectObj.h);
-    context.fillStyle = rectObj.color;
-    context.fillRect(rectObj.x, rectObj.y, rectObj.w, rectObj.h);
+
+    if (this.image === null) {
+      context.fillStyle = "rgba(0,0,0,0)";
+      context.clearRect(rectObj.x, rectObj.y, rectObj.w, rectObj.h);
+
+      context.fillStyle = rectObj.color;
+      context.fillRect(rectObj.x, rectObj.y, rectObj.w, rectObj.h);
+      this.fillTextInRect(rectObj)
+    } else {
+
+      // context.clearRect(rectObj.x, rectObj.y, rectObj.w, rectObj.h);
+
+      const img = new Image();
+      img.src = rectObj.image.img_src;
+
+      img.onload = () => {
+        console.log(rectObj.text);
+        console.log(this.canvas.width);
+        console.log(this.canvas.height);
+
+        const width = this.image.width / this.size;
+        const height = this.image.height / this.size;
+
+        context.drawImage(img, rectObj.image.x, rectObj.image.y, width, height , rectObj.x, rectObj.y , rectObj.w, rectObj.h);
+        this.strokeRect(rectObj);
+        context.font = "30px Verdana";
+        this.fillTextInRect(rectObj)
+      }
+    }
+
+    
   }
 
   strokeRect(rectObj) {
@@ -108,7 +139,8 @@ export class MyCanvas {
 
   fillTextInRect(rectObj) {
     const context = this.canvas.getContext("2d");
-    context.fillStyle = "#000";
+    context.fillStyle = "white";
+    // console.log("text");
     context.fillText(rectObj.text, rectObj.x + rectObj.w / 2, rectObj.h / 2 + rectObj.y);
   }
 
@@ -177,7 +209,6 @@ export class MyCanvas {
         return i;
       }
     }
-    // return 
   }
 
   swapObjectProperties(currentCol, stepInArray) {
@@ -192,6 +223,7 @@ export class MyCanvas {
     rectObjCur.h = rectObjPrev.h;
     rectObjCur.color = rectObjPrev.color;
     rectObjCur.text = rectObjPrev.text;
+    rectObjCur.image = rectObjPrev.image;
 
     rectObjPrev.num = tmp.num;
     rectObjPrev.x = tmp.x;
@@ -200,6 +232,7 @@ export class MyCanvas {
     rectObjPrev.h = tmp.h;
     rectObjPrev.color = tmp.color;
     rectObjPrev.text = tmp.text;
+    rectObjPrev.image = tmp.image;
   }
 
   swapOnX(currentCol, stepInArray, step) {
@@ -225,6 +258,9 @@ export class MyCanvas {
           this.swapObjectProperties(currentCol, stepInArray);
           console.log("after2: ");
           console.log(this.rectObjects);
+          this.drawRect(rectObjCur);
+          this.drawRect(rectObjPrev);
+          // this.redrawCanvas();
         }
       }, 1 * i);
     }
@@ -248,11 +284,9 @@ export class MyCanvas {
         this.strokeRect(rectObjCur);
         this.fillTextInRect(rectObjCur);
         if (i === rectObjCur.w - 1) {
-          // console.log("after: ");
-          // console.log(this.rectObjects);
           this.swapObjectProperties(currentCol, stepInArray);
-          // console.log("after2: ");
-          // console.log(this.rectObjects);
+          this.drawRect(rectObjCur);
+          this.drawRect(rectObjPrev);
         }
       }, 1 * i);
     }
@@ -280,6 +314,7 @@ export class MyCanvas {
     } else if (isDownY) {
       this.swapOnY(currentCol, stepInArray, -1);
     }
+    //this.redrawCanvas();
   }
 
   checkLeft(currentCol) {
@@ -326,5 +361,69 @@ export class MyCanvas {
     }
     return false;
   }
+  setImage() {
+    if (this.rectObjects.length === 0) {
+      console.log("reject");
+      return;
+    }
+    this.image = null;
+    const img = new Image();
+    img.src = getRandomImage();
+    img.setAttribute("crossorigin","anonymous");
+
+
+
+
+    const context = this.canvas.getContext("2d");
+    // context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    img.onload = (() => {
+      this.canvasInnerWidthHeightCoef = img.width / this.canvas.width ;
+      this.canvas.width = img.width;
+      this.canvas.height = img.height;
+      this.image = img;
+
+      const width = img.width / this.size;
+      const height = img.height / this.size;
+
+                // const curX = (i % this.size);
+          // const curY = Math.floor(i / this.size);
+
+      for (let i = 0; i < this.size; i += 1) {
+        for (let j = 0; j < this.size; j += 1) {
+          context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          context.drawImage(img, width * j, height * i, width, height,    width * j, height * i, width, height);
+
+          const _image = {
+            img_src: this.canvas.toDataURL(),
+            x: width * j,
+            y: height * i,
+          }
+          this.images.push(_image)
+          context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+      }
+      for (let i = 0; i < this.size * this.size; i += 1) {
+        const rectObj = this.rectObjects[i];
+
+        rectObj.x *= this.canvasInnerWidthHeightCoef;
+        rectObj.y *= this.canvasInnerWidthHeightCoef;
+        rectObj.w *= this.canvasInnerWidthHeightCoef;
+        rectObj.h *= this.canvasInnerWidthHeightCoef;
+
+        if (rectObj.text === "") {
+          rectObj.image = this.images[this.size * this.size - 1];
+        } else {
+          rectObj.image = this.images[parseInt(rectObj.text) - 1];
+        }
+        this.drawRect(rectObj);
+        /*if (i === this.size * this.size - 1) {
+          console.log("redrawCanvas");
+          this.redrawCanvas();
+        }*/
+      }
+    })
+
+  }
+ 
 }
 export default MyCanvas;

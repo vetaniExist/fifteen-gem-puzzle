@@ -11,7 +11,7 @@ module.exports = (env, options) => {
         mode: isProd ? 'production' : 'development',
         devtool: isProd ? 'cheap-module-source-map' : 'source-map',
         watch: !isProd, 
-        entry: ['./src/js/index.js', './src/css/style.css', './src/css/normalize.css'],
+        entry: ['babel-polyfill', './src/js/index.js', './src/css/style.css', './src/css/normalize.css'],
         output: {
             filename: 'main3.js',
             path: path.resolve(__dirname, 'dist'),
@@ -25,7 +25,10 @@ module.exports = (env, options) => {
                     use: {
                         loader: 'babel-loader',
                         options: {
-                            presets: ['@babel/preset-env']
+                            presets: ['@babel/preset-env'],
+                            plugins: [
+                                ["@babel/transform-runtime"]
+                            ]
                         }
                     }
                 },

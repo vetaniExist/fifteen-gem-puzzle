@@ -39,6 +39,8 @@ const buttonLoadLastGame = configurateButton("last game");
 
 const buttonSettingBack = configurateButton("back");
 
+const buttonForImages = configurateButton("add image");
+
 function configurateLayout() {
   wrapper.classList.add("wrapper");
   canvas.setAttribute("id", "puzzle_canvas");
@@ -52,6 +54,7 @@ function configurateLayout() {
   controlButtonsDiv.appendChild(buttonAutoSolvation);
   controlButtonsDiv.appendChild(buttonSetting);
   controlButtonsDiv.appendChild(buttonBestScore);
+  controlButtonsDiv.appendChild(buttonForImages);
 
   canvasDiv.appendChild(time);
   canvasDiv.appendChild(canvas);
@@ -142,4 +145,5 @@ module.exports = {
   updateTimeEl,
   getTimeInnerText,
   initializeControlButtons,
+  buttonForImages,
 };
