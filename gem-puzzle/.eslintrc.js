@@ -17,6 +17,7 @@ module.exports = {
     },
     "rules": {
         "linebreak-style": ["error", "windows"],
-        "quotes": ["error", "double"]
+        "quotes": ["error", "double"],
+        "max-len": ["error", { "code": 120 }]
     }
 };

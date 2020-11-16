@@ -5,7 +5,6 @@ import {
 import {
   getRandomInt,
   formatTime,
-  getRandomImage,
 } from "./utils";
 
 import {
@@ -16,7 +15,6 @@ import {
 import {
   PriorityQueue,
 } from "./PriorityQueue";
-
 
 export class GamePuzzle {
   constructor(canvas) {
@@ -76,7 +74,6 @@ export class GamePuzzle {
       this.startArray.push("");
       this.winCondition.push("");
     } else {
-      console.log("restart");
       this.configurateStartField();
     }
   }
@@ -129,8 +126,6 @@ export class GamePuzzle {
     this.mouseHandlerMove = null;
     this.mouseHandlerLeave = null;
     this.gameWin = false;
-    console.log("restartewd");
-    console.log(this);
   }
 
   start() {
@@ -140,11 +135,6 @@ export class GamePuzzle {
 
     this.initAudio();
     this.configurateStartField();
-    // console.log("start with this nums:");
-    // console.log(this.startArray);
-
-    // console.log("start with this winCondition:");
-    // console.log(this.winCondition);
     this.stepCounter = 0;
     this.canvasObj.initBasicField(this.startArray, this.size, this.winCondition);
     this.startGame();
@@ -157,8 +147,6 @@ export class GamePuzzle {
 
     this.canvasObj.canvas.addEventListener("mousedown", (event) => {
       // запомнили координаты при нажатии, установили mouseMove в эту же позицию
-      console.log("this.mouse");
-      console.log(this.mouse);
       this.mouse.x = event.clientX - this.canvasRect.left;
       this.mouse.y = event.clientY - this.canvasRect.top;
 
@@ -184,7 +172,6 @@ export class GamePuzzle {
         const currentBlockClick = this.getBucketY(this.mouse.y)
           + this.getBucketValue(this.mouse.x);
         if (this.canvasObj.trySwap(currentBlockClick)) {
-          console.log("клик рабоатет");
           this.mouse.isClickAviable = false;
           setTimeout(() => {
             this.mouse.isClickAviable = true;
@@ -192,7 +179,6 @@ export class GamePuzzle {
           this.audio.swipe.play();
           this.stepCounter += 1;
           this.updateTime();
-          console.log("Step is correct. Count of steps = ".concat(this.stepCounter));
           setTimeout(() => {
             if (this.canvasObj.checkWinCondition()) {
               this.canvasObj.addWinText(this.stepCounter, this.checkTime());
@@ -218,7 +204,6 @@ export class GamePuzzle {
     if (this.mouse.isDown && !this.gameWin) {
       this.currCell.x = this.mouse.x;
       this.currCell.y = this.mouse.y;
-      console.log("Покинули пределы канваса");
       this.canvasObj.redrawCanvas(this.currCell);
     }
   }
@@ -233,20 +218,15 @@ export class GamePuzzle {
       if (Math.abs(this.mouse.moveX - this.mouse.x) > 25
         || Math.abs(this.mouse.moveY - this.mouse.y) > 25) {
         this.mouse.isClickAviable = false;
-        console.log("Math.abs(this.mouse.moveX - this.mouse.x)");
+        /* console.log("Math.abs(this.mouse.moveX - this.mouse.x)");
         console.log(Math.abs(this.mouse.moveX - this.mouse.x));
 
         console.log("Math.abs(this.mouse.moveY - this.mouse.y)");
-        console.log(Math.abs(this.mouse.moveY - this.mouse.y));
+        console.log(Math.abs(this.mouse.moveY - this.mouse.y)); */
 
         this.currCell.x = this.mouse.moveX;
         this.currCell.y = this.mouse.moveY;
-
-        console.log("find cell");
-        console.log(this.currCell);
         this.canvasObj.redrawCanvas(this.currCell);
-
-        console.log("move");
       }
     }
   }
@@ -298,7 +278,8 @@ export class GamePuzzle {
   updateTime(minutes, sec) {
     if (minutes === undefined || sec === undefined) {
       const timeElInner = getTimeInnerText();
-      updateTimeEl(timeElInner.slice(0, timeElInner.length - this.stepCounter.toString(10).length).concat(this.stepCounter));
+      updateTimeEl(timeElInner.slice(0, timeElInner.length - this.stepCounter.toString(10).length)
+        .concat(this.stepCounter));
     } else {
       updateTimeEl(formatTime(minutes).concat(" : ").concat(formatTime(sec)).concat(" step: ")
         .concat(this.stepCounter));
@@ -334,7 +315,6 @@ export class GamePuzzle {
   }
 
   saveGame() {
-    console.log("saveGame func");
     const canvasObjField = this.canvasObj.getRectObjects();
     const gamePuzzleCurrentGame = {
       canvasField: canvasObjField,
@@ -342,32 +322,25 @@ export class GamePuzzle {
       step: this.stepCounter,
       size: this.size,
       startArray: this.startArray,
-    }
+    };
     // canvasObjField.push(timeStep);
     localStorage.setItem("vetaniExistGamePuzzleCurrentGame", JSON.stringify(gamePuzzleCurrentGame));
-    console.log(localStorage.getItem("vetaniExistGamePuzzleCurrentGame"));
   }
 
   loadGame() {
     const gamePuzzleCurrentGame = JSON.parse(localStorage.getItem("vetaniExistGamePuzzleCurrentGame"));
-    if (gamePuzzleCurrentGame === "null") {
-      return false;
-    }
-    this.canvasObj.setRectObjects(gamePuzzleCurrentGame.canvasField);
-    this.winCondition = gamePuzzleCurrentGame.winCondition;
-    this.size = gamePuzzleCurrentGame.size;
-    this.stepCounter = gamePuzzleCurrentGame.step;
-    const startArray = gamePuzzleCurrentGame.startArray;
+    if (gamePuzzleCurrentGame !== "null") {
+      this.canvasObj.setRectObjects(gamePuzzleCurrentGame.canvasField);
+      this.winCondition = gamePuzzleCurrentGame.winCondition;
+      this.size = gamePuzzleCurrentGame.size;
+      this.stepCounter = gamePuzzleCurrentGame.step;
 
-    console.log("проверка");
-    console.log(this.canvasObj.getRectObjects());
-    console.log(gamePuzzleCurrentGame.canvasField);
-    this.initAudio();
-    this.canvasObj.initBasicField(startArray, this.size, this.winCondition, true);
-    this.startGame();
+      this.initAudio();
+      this.canvasObj.initBasicField(gamePuzzleCurrentGame.startArray, this.size, this.winCondition, true);
+      this.startGame();
+    }
   }
 
-  ///////////////////////////
   autoSolvation() {
     const originalField = (this.canvasObj.getRectObjects()).slice();
 
@@ -384,19 +357,19 @@ export class GamePuzzle {
       prev: null,
       h: this.calculateH(originalField),
       g: 0,
-    }
+    };
 
     priorityQueue.enqueue(startNode, startNode.g + startNode.h);
     visited.push(startNode.field);
 
     let iter = 0;
-    let currentMinState = {...startNode};
+    let currentMinState = { ...startNode };
 
-    while(priorityQueue.length() !== 0) {
+    while (priorityQueue.length() !== 0) {
       if (iter >= 50000) {
         break;
       }
-      iter++
+      iter += 1;
 
       const priorityQueueItem = priorityQueue.dequeue();
       const currentNode = priorityQueueItem.element;
@@ -405,12 +378,12 @@ export class GamePuzzle {
       if (currentNode.leftCell !== null) {
         const leftChild = this.getNode(currentNode, -1);
         if (!this.checkInVisitedArray(visited, leftChild.field)) {
-          priorityQueue.enqueue(leftChild,  leftChild.h);
+          priorityQueue.enqueue(leftChild, leftChild.h);
           visited.push(leftChild.field);
           if (leftChild.h < currentMinState.h) {
-            currentMinState = {...leftChild};
-          } 
-          if(currentMinState.h === 0) {
+            currentMinState = { ...leftChild };
+          }
+          if (currentMinState.h === 0) {
             break;
           }
         }
@@ -424,9 +397,9 @@ export class GamePuzzle {
           priorityQueue.enqueue(rightChild, rightChild.h);
           visited.push(rightChild.field);
           if (rightChild.h < currentMinState.h) {
-            currentMinState = {...rightChild};
+            currentMinState = { ...rightChild };
           }
-          if(currentMinState.h === 0) {
+          if (currentMinState.h === 0) {
             break;
           }
         }
@@ -441,9 +414,9 @@ export class GamePuzzle {
           visited.push(topChild.field);
         }
         if (topChild.h < currentMinState.h) {
-          currentMinState = {...topChild};
+          currentMinState = { ...topChild };
         }
-        if(currentMinState.h === 0) {
+        if (currentMinState.h === 0) {
           break;
         }
       }
@@ -457,28 +430,19 @@ export class GamePuzzle {
           visited.push(bottomChild.field);
         }
         if (bottomChild.h < currentMinState.h) {
-          currentMinState ={...bottomChild};
+          currentMinState = { ...bottomChild };
         }
-        if(currentMinState.h === 0) {
+        if (currentMinState.h === 0) {
           break;
         }
       }
     }
-
-    console.log("iter = " + iter);
-
-
-    console.log("currentMinState");
-
-    console.log(currentMinState);
     this.getSolvePath(currentMinState);
   }
 
-  checkInVisitedArray(visited, field){
-    //console.log(visited);
+  checkInVisitedArray(visited, field) {
     for (let i = 0; i < visited.length; i += 1) {
-
-      for(let j = 0; j < visited[i].length; j += 1) {
+      for (let j = 0; j < visited[i].length; j += 1) {
         if (visited[i][j] !== field[j]) {
           break;
         }
@@ -486,7 +450,6 @@ export class GamePuzzle {
           return true;
         }
       }
-     
     }
     return false;
   }
@@ -502,19 +465,19 @@ export class GamePuzzle {
   }
 
   getNode(prev, step) {
-    const _field = this.updateField(prev.field.slice(), step);
-    const emptyCellNum = this.getEmptyCellIndex(_field);
+    const newField = this.updateField(prev.field.slice(), step);
+    const emptyCellNum = this.getEmptyCellIndex(newField);
 
     return {
-      field: _field,
+      field: newField,
       leftCell: this.getLeftNeighbor(emptyCellNum),
       rightCell: this.getRightNeigbor(emptyCellNum),
       topCell: this.getTopNeighbor(emptyCellNum),
       bottomCell: this.getBottomNeigbor(emptyCellNum),
-      prev: prev,
-      h: this.calculateH(_field),
+      prev,
+      h: this.calculateH(newField),
       g: this.getDistanse(prev),
-    }
+    };
   }
 
   getEmptyCellIndex(field) {
@@ -523,12 +486,13 @@ export class GamePuzzle {
       field.forEach((element, index) => {
         if (element.text === "") {
           result = index;
-          throw result
+          throw result;
         }
       });
     } catch (e) {
       return e;
     }
+    return result;//
   }
 
   getLeftNeighbor(emptyCellNum) {
@@ -578,7 +542,6 @@ export class GamePuzzle {
     }
     return counterOfInconsistency;
   }
-  
 
   getDistanse(ansestor) {
     if (ansestor.prev !== null) {
@@ -590,12 +553,14 @@ export class GamePuzzle {
   getSolvePath(node) {
     const cellSize = 480 / this.size;
     const steps = [];
-    while (node.prev !== null) {
-      const prevField = node.prev.field;
-      steps.unshift(this.getDifference(node.field, prevField));
-      node = node.prev;
+    let curNode = node;
+    while (curNode.prev !== null) {
+      const prevField = curNode.prev.field;
+      const curField = curNode.field;
+      steps.unshift(this.getDifference(curField, prevField));
+      curNode = curNode.prev;
     }
- 
+
     for (let i = 0; i < steps.length; i += 1) {
       setTimeout(() => {
         const cellNum = this.canvasObj.getRectObjNumByValue(steps[i]);
@@ -616,6 +581,7 @@ export class GamePuzzle {
         }
       }
     }
+    return null;
   }
 
   getBucketValue(x) {
