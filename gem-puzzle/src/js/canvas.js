@@ -133,7 +133,7 @@ export class MyCanvas {
     context.strokeText(rectObj.text, rectObj.x + rectObj.w / 2, rectObj.h / 2 + rectObj.y);
   }
 
-  addWinText(step, time) {
+  addWinText(step, time, score) {
     this.rectObjects = [];
     const context = this.canvas.getContext("2d");
     context.font = "30px Verdana";
@@ -142,6 +142,7 @@ export class MyCanvas {
     context.fillRect(0, 0, 480, 480);
     context.fillStyle = "white";
     context.fillText("You win!!! Step Count:".concat(step), 0, 120);
+    context.fillText("Score: " + score, 0, 150);
     context.font = "24px Verdana";
     context.fillText(time, 0, 250);
   }

@@ -53,6 +53,7 @@ export class GamePuzzle {
     this.timer = null;
     this.cTimer = new Timer();
     this.gameWin = false;
+    this.score = 0;
 
     this.initAudio();
   }
@@ -66,9 +67,9 @@ export class GamePuzzle {
   }
 
   initAudio() {
-    const audioSwipe =  document.createElement("audio");
+    const audioSwipe = document.createElement("audio");
     audioSwipe.src = wav;
-   
+
     this.audio.sounds.swipe = audioSwipe;
     this.audio.volume = this.audio.volume ? this.audio.volume : 0.2;
   }
@@ -239,9 +240,16 @@ export class GamePuzzle {
           setTimeout(() => {
             if (this.canvasObj.checkWinCondition()) {
               this.cTimer.stop();
-              this.canvasObj.addWinText(this.stepCounter, this.checkTime());
-              this.onMouseUp();
               this.gameWin = true;
+              this.canvasObj.addWinText(this.stepCounter, this.checkTime(), this.calculateScore());
+
+              document.getElementById("puzzle_canvas").removeEventListener("mouseup", this.mouseHandlerUp);
+              document.getElementById("puzzle_canvas").removeEventListener("mousemove", this.mouseHandlerMove);
+              document.getElementById("puzzle_canvas").removeEventListener("mouseleave", this.mouseHandlerLeave);
+
+              this.mouseHandlerMove = null;
+              this.mouseHandlerUp = null;
+              this.mouseHandlerLeave = null;
             } else {
               this.saveGame();
             }
@@ -314,7 +322,7 @@ export class GamePuzzle {
             if (this.canvasObj.checkWinCondition()) {
               this.canvasObj.addWinText(this.stepCounter, this.checkTime());
               this.onMouseUp();
-              this.gameWin = true;
+              f
               // this.restart();
             } else {
               this.saveGame();
@@ -352,9 +360,60 @@ export class GamePuzzle {
       step: this.stepCounter,
       size: this.size,
       startArray: this.startArray,
+      minutes: this.cTimer.getMinutes(),
+      seconds: this.cTimer.getSeconds(),
+      score: this.score,
     };
-    // canvasObjField.push(time);
     localStorage.setItem("vetaniExistGamePuzzleCurrentGame", JSON.stringify(gamePuzzleCurrentGame));
+
+    if (localStorage.getItem("vetaniExistGamePuzzleTopGames")) {
+      const top = JSON.parse(localStorage.getItem("vetaniExistGamePuzzleTopGames"));
+      const topKeys = Object.keys(top);
+      if (topKeys.length < 10) {
+        const objectOfTop = {};
+        for (let i = 0; i < topKeys.length; i += 1) {
+          objectOfTop[i] = top[i];
+        }
+        objectOfTop[topKeys.length] = gamePuzzleCurrentGame;
+        console.log(objectOfTop);
+        localStorage.removeItem("vetaniExistGamePuzzleTopGames");
+        localStorage.setItem("vetaniExistGamePuzzleTopGames", JSON.stringify(objectOfTop));
+      } else {
+        for (let i = 0; i < 10; i += 1) {
+          if (gamePuzzleCurrentGame.score > top[i]){
+            top[i] = gamePuzzleCurrentGame;
+            break;
+          }
+        }
+        localStorage.removeItem("vetaniExistGamePuzzleTopGames");
+        localStorage.setItem("vetaniExistGamePuzzleTopGames", JSON.stringify(top));
+      }
+
+      //console.log(tmpKeys.length);
+    } else {
+      const objectOfTop = {
+        0: gamePuzzleCurrentGame,
+      };
+
+      localStorage.setItem("vetaniExistGamePuzzleTopGames", JSON.stringify(objectOfTop));
+      console.log("dont get");
+    }
+  }
+
+  bubleSortTop() {
+    const top = JSON.parse(localStorage.getItem("vetaniExistGamePuzzleTopGames"));
+    const topKeys = Object.keys(top);
+    for (let i = 0; i < topKeys; i += 1) {
+      for (let j = 0; j < topKeys;j += 1) {
+        if (top[j].score > top[i].score) {
+          const tmp = top[i];
+          top[i] = top[j];
+          top[i] = tmp;
+        }
+      }
+    }
+    localStorage.removeItem("vetaniExistGamePuzzleTopGames");
+    localStorage.setItem("vetaniExistGamePuzzleTopGames", JSON.stringify(objectOfTop));
   }
 
   loadGame() {
@@ -367,11 +426,21 @@ export class GamePuzzle {
 
       // this.initAudio();
       this.canvasObj.initBasicField(gamePuzzleCurrentGame.startArray, this.size, this.winCondition, true);
+      this.cTimer.restart();
+      this.cTimer = new Timer();
+
+      this.cTimer.setMinutes(gamePuzzleCurrentGame.minutes);
+      this.cTimer.setSeconds(gamePuzzleCurrentGame.seconds);
+
+      this.cTimer.startTimer();
       this.startGame();
     }
   }
 
   autoSolvation() {
+    if (this.startArray.length === 0) {
+      return;
+    }
 
     setTimeout(() => {
       document.body.appendChild(popupDiv);
@@ -610,6 +679,7 @@ export class GamePuzzle {
           }
           const cellNum = this.canvasObj.getRectObjNumByValue(steps[i]);
           this.canvasObj.trySwap(cellNum);
+          this.calculateH();
           this.playAudio();
           this.stepCounter += 1;
           this.updateTime();
@@ -655,6 +725,24 @@ export class GamePuzzle {
 
   addImageOnBoard() {
     this.canvasObj.setImage();
+  }
+
+  calculateScore() {
+    let minuteScore = this.cTimer.getMinutes() * 60;
+    let secondsScore = this.cTimer.getSeconds();
+    if (!minuteScore) {
+      minuteScore = 1;
+    }
+    if (!secondsScore) {
+      secondsScore = 1;
+    }
+
+    this.score = this.size * 10000 - this.stepCounter * minuteScore * secondsScore;
+    if (this.score < 0) {
+      console.log("this.score");
+      this.score = 1;
+    }
+    return this.score;
   }
 }
 
