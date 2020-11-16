@@ -159,11 +159,6 @@ export class GamePuzzle {
     this.canvasRect = null;
     this.stepCounter = 0;
     this.today = null;
-    this.audio = {
-      sounds: [],
-      volume: 0.1,
-      isAviable: true,
-    }
     this.mouse = {
       x: 0,
       y: 0,
@@ -393,6 +388,7 @@ export class GamePuzzle {
   }
 
   autoSolvation() {
+    this.gameWin = true;
     const originalField = (this.canvasObj.getRectObjects()).slice();
 
     const emptyCellNum = GamePuzzle.getEmptyCellIndex(originalField);
@@ -616,6 +612,9 @@ export class GamePuzzle {
       setTimeout(() => {
         const cellNum = this.canvasObj.getRectObjNumByValue(steps[i]);
         this.canvasObj.trySwap(cellNum);
+        this.playAudio();
+        this.stepCounter += 1;
+        this.updateTime();
         console.log(cellSize);
       }, i * cellSize + 300 * i);
     }

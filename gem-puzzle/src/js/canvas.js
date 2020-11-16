@@ -113,7 +113,7 @@ export class MyCanvas {
         context.drawImage(img, rectObj.image.x, rectObj.image.y, width, height, rectObj.x,
           rectObj.y, rectObj.w, rectObj.h);
         this.strokeRect(rectObj);
-        context.font = "30px Verdana";
+        // context.font = "30px Verdana";
         this.fillTextInRect(rectObj);
       };
     }
@@ -127,8 +127,10 @@ export class MyCanvas {
   fillTextInRect(rectObj) {
     const context = this.canvas.getContext("2d");
     context.fillStyle = "white";
+    context.strokeStyle='rgb(0, 0, 0)';
     // console.log("text");
     context.fillText(rectObj.text, rectObj.x + rectObj.w / 2, rectObj.h / 2 + rectObj.y);
+    context.strokeText(rectObj.text, rectObj.x + rectObj.w / 2, rectObj.h / 2 + rectObj.y);
   }
 
   addWinText(step, time) {
@@ -362,6 +364,7 @@ export class MyCanvas {
       this.canvas.width = img.width;
       this.canvas.height = img.height;
       this.image = img;
+      context.font = `${this.canvas.width / 20}px Verdana`;
 
       const width = img.width / this.size;
       const height = img.height / this.size;
