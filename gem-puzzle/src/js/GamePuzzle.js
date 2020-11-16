@@ -156,7 +156,6 @@ export class GamePuzzle {
 
   restart() {
     this.startArray = [];
-    // this.canvas = this.getReplacedCanvas();
     this.getReplacedCanvas();
     this.canvasObj = new MyCanvas(this.canvas);
     this.canvasRect = null;
@@ -346,9 +345,9 @@ export class GamePuzzle {
     } else {
       itTookSec = newDate.getSeconds() - this.today.getSeconds();
     }
-    this.updateTime(itTookMinutes, itTookSec);
-    this.timer = this.startTimer.bind(this);
     if (!this.gameWin) {
+      this.updateTime(itTookMinutes, itTookSec);
+      this.timer = this.startTimer.bind(this);
       setTimeout(this.timer, 1000);
     }
   }
@@ -358,7 +357,13 @@ export class GamePuzzle {
 
     const itTookHours = newDate.getHours() - this.today.getHours();
     const itTookMinutes = newDate.getMinutes() - this.today.getMinutes() + itTookHours * 60;
-    const itTookSec = itTookMinutes ? newDate.getSeconds() - this.today.getSeconds() : newDate.getSeconds();
+    let itTookSec;
+    if (itTookMinutes) {
+      itTookSec = newDate.getSeconds();
+    } else {
+      itTookSec = newDate.getSeconds() - this.today.getSeconds();
+    }
+    // const itTookSec = itTookMinutes ? newDate.getSeconds() - this.today.getSeconds() : newDate.getSeconds();
 
     return "it took: minutes: ".concat(formatTime(itTookMinutes)).concat(" seconds: ").concat(formatTime(itTookSec));
   }
