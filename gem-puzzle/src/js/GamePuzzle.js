@@ -202,8 +202,8 @@ export class GamePuzzle {
 
   onMouseLeave() {
     if (this.mouse.isDown && !this.gameWin) {
-      this.currCell.x = this.mouse.x;
-      this.currCell.y = this.mouse.y;
+      this.currCell.x = this.mouse.x * this.canvasObj.getCanvasInnerWidthHeightCoef();
+      this.currCell.y = this.mouse.y * this.canvasObj.getCanvasInnerWidthHeightCoef();
       this.canvasObj.redrawCanvas(this.currCell);
     }
   }
@@ -224,8 +224,8 @@ export class GamePuzzle {
         console.log("Math.abs(this.mouse.moveY - this.mouse.y)");
         console.log(Math.abs(this.mouse.moveY - this.mouse.y)); */
 
-        this.currCell.x = this.mouse.moveX;
-        this.currCell.y = this.mouse.moveY;
+        this.currCell.x = this.mouse.moveX * this.canvasObj.getCanvasInnerWidthHeightCoef();
+        this.currCell.y = this.mouse.moveY * this.canvasObj.getCanvasInnerWidthHeightCoef();
         this.canvasObj.redrawCanvas(this.currCell);
       }
     }
@@ -247,8 +247,8 @@ export class GamePuzzle {
         const bottomCondition = this.canvasObj.checkBottom(thisWasCell) && thisWasCell - cellWeleftOff === -this.size;
         const fullCondition = leftCondition || topCondition || rightCondition || bottomCondition;
 
-        this.currCell.x = ((thisWasCell % this.size) * 480) / this.size;
-        this.currCell.y = (Math.floor(thisWasCell / this.size) * 480) / this.size;
+        this.currCell.x = (((thisWasCell % this.size) * 480) / this.size) * this.canvasObj.getCanvasInnerWidthHeightCoef();
+        this.currCell.y = ((Math.floor(thisWasCell / this.size) * 480) / this.size) * this.canvasObj.getCanvasInnerWidthHeightCoef();
         if (fullCondition && !this.gameWin) {
           this.canvasObj.trySwap(thisWasCell);
           this.stepCounter += 1;

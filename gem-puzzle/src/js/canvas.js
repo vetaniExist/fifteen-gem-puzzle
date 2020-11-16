@@ -80,7 +80,7 @@ export class MyCanvas {
     }
     if (managedObject !== null) {
       this.drawRect(managedObject);
-      this.strokeRect(managedObject);
+      // this.strokeRect(managedObject);
       // this.fillTextInRect(managedObject);
     }
   }
@@ -104,6 +104,7 @@ export class MyCanvas {
     } else {
       const img = new Image();
       img.src = rectObj.image.img_src;
+      context.clearRect(rectObj.x, rectObj.y, rectObj.w, rectObj.h);
 
       img.onload = () => {
         const width = this.image.width / this.size;
@@ -402,6 +403,10 @@ export class MyCanvas {
         } */
       }
     });
+  }
+
+  getCanvasInnerWidthHeightCoef() {
+    return this.canvasInnerWidthHeightCoef;
   }
 }
 export default MyCanvas;
