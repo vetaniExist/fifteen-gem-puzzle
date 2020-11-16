@@ -127,7 +127,7 @@ export class MyCanvas {
   fillTextInRect(rectObj) {
     const context = this.canvas.getContext("2d");
     context.fillStyle = "white";
-    context.strokeStyle='rgb(0, 0, 0)';
+    context.strokeStyle = "rgb(0, 0, 0)";
     // console.log("text");
     context.fillText(rectObj.text, rectObj.x + rectObj.w / 2, rectObj.h / 2 + rectObj.y);
     context.strokeText(rectObj.text, rectObj.x + rectObj.w / 2, rectObj.h / 2 + rectObj.y);

@@ -58,13 +58,11 @@ buttonForImages.addEventListener("click", () => {
 });
 
 buttonSettingVolumeOnOf.addEventListener("click", () => {
-  buttonSettingVolumeOnOfSwitch( gamePuzzle.audioOnOf());
+  buttonSettingVolumeOnOfSwitch(gamePuzzle.audioOnOf());
 });
-
 
 buttonSettingVolumeDown.addEventListener("click", () => {
   buttonSettingVolumeOnOfSwitch(gamePuzzle.audioVolumeDown());
-  
 });
 
 buttonSettingVolumeUp.addEventListener("click", () => {

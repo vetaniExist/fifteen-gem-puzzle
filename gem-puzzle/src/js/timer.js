@@ -20,8 +20,8 @@ export class Timer {
     this.minutes = 0;
     this.isActive = false;
   }
-  
-  stop(){
+
+  stop() {
     this.isActive = false;
   }
 
@@ -37,14 +37,13 @@ export class Timer {
 
       const timeElInner = getTimeInnerText();
 
-      const notTime = timeElInner.slice(7)
-      const currTime = formatTime(this.minutes) + " : " + formatTime(this.seconds);
+      const notTime = timeElInner.slice(7);
+      const currTime = `${formatTime(this.minutes)} : ${formatTime(this.seconds)}`;
       updateTimeEl(currTime.concat(notTime));
 
       this.timer = this.startTimer.bind(this);
       setTimeout(this.timer, 1000);
     }
-
   }
 
   getMinutes() {

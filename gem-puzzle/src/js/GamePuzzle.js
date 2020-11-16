@@ -1,3 +1,4 @@
+import wav from "../assets/sounds/tink.wav";
 import {
   MyCanvas,
 } from "./canvas";
@@ -65,8 +66,9 @@ export class GamePuzzle {
   }
 
   initAudio() {
-    const audioSwipe = document.createElement("audio");
-    audioSwipe.setAttribute("src", "/src/assets/sounds/tink.wav");
+    const audioSwipe =  document.createElement("audio");
+    audioSwipe.src = wav;
+   
     this.audio.sounds.swipe = audioSwipe;
     this.audio.volume = this.audio.volume ? this.audio.volume : 0.2;
   }

@@ -43,7 +43,7 @@ const buttonSettingBack = configurateButton("back");
 
 const buttonForImages = configurateButton("add image");
 
-//////////////////////popup vars
+/// ///////////////////popup vars
 const popupDiv = createEl("div");
 
 function configurateLayout() {
@@ -135,7 +135,7 @@ function onButtonLoad() {
   controlButtonsDiv.appendChild(buttonSettingBack);
 }
 
-function buttonSettingVolumeOnOfSwitch(isOn){
+function buttonSettingVolumeOnOfSwitch(isOn) {
   isOn ? buttonSettingVolumeOnOf.innerText = "volume: on" : buttonSettingVolumeOnOf.innerText = "volume: of";
 }
 
