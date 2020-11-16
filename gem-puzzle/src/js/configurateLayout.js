@@ -43,11 +43,15 @@ const buttonSettingBack = configurateButton("back");
 
 const buttonForImages = configurateButton("add image");
 
+//////////////////////popup vars
+const popupDiv = createEl("div");
+
 function configurateLayout() {
   wrapper.classList.add("wrapper");
   canvas.setAttribute("id", "puzzle_canvas");
   canvasDiv.classList.add("canvas_div");
   time.classList.add("time");
+  configuratePopup();
 
   controlButtonsDiv.classList.add("control_buttons_div");
 
@@ -65,6 +69,20 @@ function configurateLayout() {
   wrapper.appendChild(controlButtonsDiv);
 
   document.body.appendChild(wrapper);
+}
+
+function configuratePopup() {
+  popupDiv.setAttribute("id", "popup_div");
+  popupDiv.innerText = "calculating";
+}
+
+function deployPopup() {
+  canvasDiv.appendChild(popupDiv);
+  return true;
+}
+
+function hidePopup() {
+  canvasDiv.removeChild(popupDiv);
 }
 
 function updateTimeEl(newTimeContent) {
@@ -160,4 +178,7 @@ module.exports = {
   buttonSettingVolumeOnOfSwitch,
   buttonSettingVolumeDown,
   buttonSettingVolumeUp,
+  deployPopup,
+  hidePopup,
+  popupDiv,
 };

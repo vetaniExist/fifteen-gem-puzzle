@@ -10,6 +10,9 @@ import {
 import {
   updateTimeEl,
   getTimeInnerText,
+  deployPopup,
+  hidePopup,
+  popupDiv,
 } from "./configurateLayout";
 
 import {
@@ -25,7 +28,7 @@ export class GamePuzzle {
     this.canvasRect = null;
     this.stepCounter = 0;
     this.today = null;
-    this.size = 3;
+    this.size = 4;
     this.audio = {
       sounds: [],
       volume: 0.1,
@@ -388,47 +391,102 @@ export class GamePuzzle {
   }
 
   autoSolvation() {
-    this.gameWin = true;
-    const originalField = (this.canvasObj.getRectObjects()).slice();
 
-    const emptyCellNum = GamePuzzle.getEmptyCellIndex(originalField);
-    const priorityQueue = new PriorityQueue();
-    const visited = [];
+    setTimeout(() => {
+      document.body.appendChild(popupDiv);
+    }, 0);
 
-    const startNode = {
-      field: originalField,
-      leftCell: this.getLeftNeighbor(emptyCellNum),
-      rightCell: this.getRightNeigbor(emptyCellNum),
-      topCell: this.getTopNeighbor(emptyCellNum),
-      bottomCell: this.getBottomNeigbor(emptyCellNum),
-      prev: null,
-      h: this.calculateH(originalField),
-      g: 0,
-    };
-
-    priorityQueue.enqueue(startNode, startNode.g + startNode.h);
-    visited.push(startNode.field);
-
-    let iter = 0;
-    let currentMinState = { ...startNode };
-
-    while (priorityQueue.length() !== 0) {
-      if (iter >= 50000) {
-        break;
-      }
-      iter += 1;
-
-      const priorityQueueItem = priorityQueue.dequeue();
-      const currentNode = priorityQueueItem.element;
-
-      // Проверяем детей слева
-      if (currentNode.leftCell !== null) {
-        const leftChild = this.getNode(currentNode, -1);
-        if (!GamePuzzle.checkInVisitedArray(visited, leftChild.field)) {
-          priorityQueue.enqueue(leftChild, leftChild.h);
-          visited.push(leftChild.field);
-          if (leftChild.h < currentMinState.h) {
-            currentMinState = { ...leftChild };
+    setTimeout(() => {
+      this.gameWin = true;
+      const originalField = (this.canvasObj.getRectObjects()).slice();
+  
+      const emptyCellNum = GamePuzzle.getEmptyCellIndex(originalField);
+      const priorityQueue = new PriorityQueue();
+      const visited = [];
+  
+      const startNode = {
+        field: originalField,
+        leftCell: this.getLeftNeighbor(emptyCellNum),
+        rightCell: this.getRightNeigbor(emptyCellNum),
+        topCell: this.getTopNeighbor(emptyCellNum),
+        bottomCell: this.getBottomNeigbor(emptyCellNum),
+        prev: null,
+        h: this.calculateH(originalField),
+        g: 0,
+      };
+  
+      priorityQueue.enqueue(startNode, startNode.g + startNode.h);
+      visited.push(startNode.field);
+  
+      let iter = 0;
+      let currentMinState = { ...startNode };
+  
+      while (priorityQueue.length() !== 0) {
+        if (iter >= 50000) {
+          break;
+        }
+        iter += 1;
+  
+        const priorityQueueItem = priorityQueue.dequeue();
+        const currentNode = priorityQueueItem.element;
+  
+        // Проверяем детей слева
+        if (currentNode.leftCell !== null) {
+          const leftChild = this.getNode(currentNode, -1);
+          if (!GamePuzzle.checkInVisitedArray(visited, leftChild.field)) {
+            priorityQueue.enqueue(leftChild, leftChild.h);
+            visited.push(leftChild.field);
+            if (leftChild.h < currentMinState.h) {
+              currentMinState = { ...leftChild };
+            }
+            if (currentMinState.h === 0) {
+              break;
+            }
+          }
+        }
+  
+        // Проверим детей справа
+        if (currentNode.rightCell !== null) {
+          const rightChild = this.getNode(currentNode, 1);
+  
+          if (!GamePuzzle.checkInVisitedArray(visited, rightChild.field)) {
+            priorityQueue.enqueue(rightChild, rightChild.h);
+            visited.push(rightChild.field);
+            if (rightChild.h < currentMinState.h) {
+              currentMinState = { ...rightChild };
+            }
+            if (currentMinState.h === 0) {
+              break;
+            }
+          }
+        }
+  
+        // Проверим детей сверху
+        if (currentNode.topCell !== null) {
+          const topChild = this.getNode(currentNode, -this.size);
+  
+          if (!GamePuzzle.checkInVisitedArray(visited, topChild.field)) {
+            priorityQueue.enqueue(topChild, topChild.h);
+            visited.push(topChild.field);
+          }
+          if (topChild.h < currentMinState.h) {
+            currentMinState = { ...topChild };
+          }
+          if (currentMinState.h === 0) {
+            break;
+          }
+        }
+  
+        // Проверим детей снизу
+        if (currentNode.bottomCell !== null) {
+          const bottomChild = this.getNode(currentNode, this.size);
+  
+          if (!GamePuzzle.checkInVisitedArray(visited, bottomChild.field)) {
+            priorityQueue.enqueue(bottomChild, bottomChild.h);
+            visited.push(bottomChild.field);
+          }
+          if (bottomChild.h < currentMinState.h) {
+            currentMinState = { ...bottomChild };
           }
           if (currentMinState.h === 0) {
             break;
@@ -436,55 +494,9 @@ export class GamePuzzle {
         }
       }
 
-      // Проверим детей справа
-      if (currentNode.rightCell !== null) {
-        const rightChild = this.getNode(currentNode, 1);
+      this.getSolvePath(currentMinState);
+    }, 25);
 
-        if (!GamePuzzle.checkInVisitedArray(visited, rightChild.field)) {
-          priorityQueue.enqueue(rightChild, rightChild.h);
-          visited.push(rightChild.field);
-          if (rightChild.h < currentMinState.h) {
-            currentMinState = { ...rightChild };
-          }
-          if (currentMinState.h === 0) {
-            break;
-          }
-        }
-      }
-
-      // Проверим детей сверху
-      if (currentNode.topCell !== null) {
-        const topChild = this.getNode(currentNode, -this.size);
-
-        if (!GamePuzzle.checkInVisitedArray(visited, topChild.field)) {
-          priorityQueue.enqueue(topChild, topChild.h);
-          visited.push(topChild.field);
-        }
-        if (topChild.h < currentMinState.h) {
-          currentMinState = { ...topChild };
-        }
-        if (currentMinState.h === 0) {
-          break;
-        }
-      }
-
-      // Проверим детей снизу
-      if (currentNode.bottomCell !== null) {
-        const bottomChild = this.getNode(currentNode, this.size);
-
-        if (!GamePuzzle.checkInVisitedArray(visited, bottomChild.field)) {
-          priorityQueue.enqueue(bottomChild, bottomChild.h);
-          visited.push(bottomChild.field);
-        }
-        if (bottomChild.h < currentMinState.h) {
-          currentMinState = { ...bottomChild };
-        }
-        if (currentMinState.h === 0) {
-          break;
-        }
-      }
-    }
-    this.getSolvePath(currentMinState);
   }
 
   static checkInVisitedArray(visited, field) {
@@ -598,8 +610,9 @@ export class GamePuzzle {
   }
 
   getSolvePath(node) {
+    // hidePopup();
     const cellSize = this.canvasObj.canvas.width / this.size;
-    const steps = [];
+    let steps = [];
     let curNode = node;
     while (curNode.prev !== null) {
       const prevField = curNode.prev.field;
@@ -610,12 +623,20 @@ export class GamePuzzle {
 
     for (let i = 0; i < steps.length; i += 1) {
       setTimeout(() => {
-        const cellNum = this.canvasObj.getRectObjNumByValue(steps[i]);
-        this.canvasObj.trySwap(cellNum);
-        this.playAudio();
-        this.stepCounter += 1;
-        this.updateTime();
-        console.log(cellSize);
+        if (this.gameWin) {
+          if (i === 0) {
+            document.body.removeChild(popupDiv);
+          }
+          const cellNum = this.canvasObj.getRectObjNumByValue(steps[i]);
+          this.canvasObj.trySwap(cellNum);
+          this.playAudio();
+          this.stepCounter += 1;
+          this.updateTime();
+          console.log(cellSize);
+        } else {
+          steps = [];
+          return;
+        }
       }, i * cellSize + 300 * i);
     }
   }
