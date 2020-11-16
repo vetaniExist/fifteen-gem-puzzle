@@ -344,7 +344,7 @@ export class GamePuzzle {
   autoSolvation() {
     const originalField = (this.canvasObj.getRectObjects()).slice();
 
-    const emptyCellNum = this.getEmptyCellIndex(originalField);
+    const emptyCellNum = GamePuzzle.getEmptyCellIndex(originalField);
     const priorityQueue = new PriorityQueue();
     const visited = [];
 
@@ -377,7 +377,7 @@ export class GamePuzzle {
       // Проверяем детей слева
       if (currentNode.leftCell !== null) {
         const leftChild = this.getNode(currentNode, -1);
-        if (!this.checkInVisitedArray(visited, leftChild.field)) {
+        if (!GamePuzzle.checkInVisitedArray(visited, leftChild.field)) {
           priorityQueue.enqueue(leftChild, leftChild.h);
           visited.push(leftChild.field);
           if (leftChild.h < currentMinState.h) {
@@ -393,7 +393,7 @@ export class GamePuzzle {
       if (currentNode.rightCell !== null) {
         const rightChild = this.getNode(currentNode, 1);
 
-        if (!this.checkInVisitedArray(visited, rightChild.field)) {
+        if (!GamePuzzle.checkInVisitedArray(visited, rightChild.field)) {
           priorityQueue.enqueue(rightChild, rightChild.h);
           visited.push(rightChild.field);
           if (rightChild.h < currentMinState.h) {
@@ -409,7 +409,7 @@ export class GamePuzzle {
       if (currentNode.topCell !== null) {
         const topChild = this.getNode(currentNode, -this.size);
 
-        if (!this.checkInVisitedArray(visited, topChild.field)) {
+        if (!GamePuzzle.checkInVisitedArray(visited, topChild.field)) {
           priorityQueue.enqueue(topChild, topChild.h);
           visited.push(topChild.field);
         }
@@ -425,7 +425,7 @@ export class GamePuzzle {
       if (currentNode.bottomCell !== null) {
         const bottomChild = this.getNode(currentNode, this.size);
 
-        if (!this.checkInVisitedArray(visited, bottomChild.field)) {
+        if (!GamePuzzle.checkInVisitedArray(visited, bottomChild.field)) {
           priorityQueue.enqueue(bottomChild, bottomChild.h);
           visited.push(bottomChild.field);
         }
@@ -440,7 +440,7 @@ export class GamePuzzle {
     this.getSolvePath(currentMinState);
   }
 
-  checkInVisitedArray(visited, field) {
+  static checkInVisitedArray(visited, field) {
     for (let i = 0; i < visited.length; i += 1) {
       for (let j = 0; j < visited[i].length; j += 1) {
         if (visited[i][j] !== field[j]) {
@@ -454,9 +454,9 @@ export class GamePuzzle {
     return false;
   }
 
-  updateField(field, step) {
+  static updateField(field, step) {
     const fieldCopy = field.slice();
-    const emptyCellNum = this.getEmptyCellIndex(fieldCopy);
+    const emptyCellNum = GamePuzzle.getEmptyCellIndex(fieldCopy);
 
     fieldCopy[emptyCellNum + step] = fieldCopy[emptyCellNum];
     fieldCopy[emptyCellNum] = field[emptyCellNum + step];
@@ -465,8 +465,8 @@ export class GamePuzzle {
   }
 
   getNode(prev, step) {
-    const newField = this.updateField(prev.field.slice(), step);
-    const emptyCellNum = this.getEmptyCellIndex(newField);
+    const newField = GamePuzzle.updateField(prev.field.slice(), step);
+    const emptyCellNum = GamePuzzle.getEmptyCellIndex(newField);
 
     return {
       field: newField,
@@ -480,7 +480,7 @@ export class GamePuzzle {
     };
   }
 
-  getEmptyCellIndex(field) {
+  static getEmptyCellIndex(field) {
     let result = null;
     try {
       field.forEach((element, index) => {
@@ -557,7 +557,7 @@ export class GamePuzzle {
     while (curNode.prev !== null) {
       const prevField = curNode.prev.field;
       const curField = curNode.field;
-      steps.unshift(this.getDifference(curField, prevField));
+      steps.unshift(GamePuzzle.getDifference(curField, prevField));
       curNode = curNode.prev;
     }
 
@@ -569,16 +569,13 @@ export class GamePuzzle {
     }
   }
 
-  getDifference(curField, prevField) {
-    console.log("getDifference");
+  static getDifference(curField, prevField) {
     for (let i = 0; i < curField.length; i += 1) {
-
       if (curField[i].text !== prevField[i].text) {
         if (prevField[i].text === "") {
           return curField[i].text;
-        } else {
-          return prevField[i].text;
         }
+        return prevField[i].text;
       }
     }
     return null;
@@ -604,9 +601,7 @@ export class GamePuzzle {
   }
 
   addImageOnBoard() {
-    console.log("testFunc");  
     this.canvasObj.setImage();
-
   }
 }
 

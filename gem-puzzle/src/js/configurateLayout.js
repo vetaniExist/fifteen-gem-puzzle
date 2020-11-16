@@ -2,7 +2,8 @@ function createEl(elName) {
   try {
     return document.createElement(elName);
   } catch (err) {
-    throw new Error("Error in createEl func. Trying to do ".concat(elName).concat(" html tag").concat(" Errr log: ").concat(err));
+    throw new Error("Error in createEl func. Trying to do ".concat(elName).concat(" html tag").concat(" Errr log: ")
+      .concat(err));
   }
 }
 
