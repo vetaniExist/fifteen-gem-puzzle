@@ -46,6 +46,11 @@ const buttonForImages = configurateButton("add image");
 /// ///////////////////popup vars
 const popupDiv = createEl("div");
 
+function configuratePopup() {
+  popupDiv.setAttribute("id", "popup_div");
+  popupDiv.innerText = "calculating";
+}
+
 function configurateLayout() {
   wrapper.classList.add("wrapper");
   canvas.setAttribute("id", "puzzle_canvas");
@@ -69,11 +74,6 @@ function configurateLayout() {
   wrapper.appendChild(controlButtonsDiv);
 
   document.body.appendChild(wrapper);
-}
-
-function configuratePopup() {
-  popupDiv.setAttribute("id", "popup_div");
-  popupDiv.innerText = "calculating";
 }
 
 function deployPopup() {
@@ -136,7 +136,11 @@ function onButtonLoad() {
 }
 
 function buttonSettingVolumeOnOfSwitch(isOn) {
-  isOn ? buttonSettingVolumeOnOf.innerText = "volume: on" : buttonSettingVolumeOnOf.innerText = "volume: of";
+  if (isOn) {
+    buttonSettingVolumeOnOf.innerText = "volume: on";
+  } else {
+    buttonSettingVolumeOnOf.innerText = "volume: of";
+  }
 }
 
 function initializeControlButtons() {

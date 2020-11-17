@@ -312,8 +312,10 @@ export class GamePuzzle {
         const bottomCondition = this.canvasObj.checkBottom(thisWasCell) && thisWasCell - cellWeleftOff === -this.size;
         const fullCondition = leftCondition || topCondition || rightCondition || bottomCondition;
 
-        this.currCell.x = (((thisWasCell % this.size) * 480) / this.size) * this.canvasObj.getCanvasInnerWidthHeightCoef();
-        this.currCell.y = ((Math.floor(thisWasCell / this.size) * 480) / this.size) * this.canvasObj.getCanvasInnerWidthHeightCoef();
+        this.currCell.x = (((thisWasCell % this.size) * 480) / this.size)
+          * this.canvasObj.getCanvasInnerWidthHeightCoef();
+        this.currCell.y = ((Math.floor(thisWasCell / this.size) * 480) / this.size)
+          * this.canvasObj.getCanvasInnerWidthHeightCoef();
         if (fullCondition && !this.gameWin) {
           this.canvasObj.trySwap(thisWasCell);
           this.stepCounter += 1;
@@ -322,7 +324,6 @@ export class GamePuzzle {
             if (this.canvasObj.checkWinCondition()) {
               this.canvasObj.addWinText(this.stepCounter, this.checkTime());
               this.onMouseUp();
-              f
               // this.restart();
             } else {
               this.saveGame();
@@ -342,7 +343,7 @@ export class GamePuzzle {
 
   updateTime() {
     const timeElInner = getTimeInnerText().slice(0, 7);
-    const stepString = " steps: " + this.stepCounter;
+    const stepString = ` steps: ${this.stepCounter}`;
     updateTimeEl(timeElInner.concat(stepString));
   }
 
@@ -375,36 +376,37 @@ export class GamePuzzle {
           objectOfTop[i] = top[i];
         }
         objectOfTop[topKeys.length] = gamePuzzleCurrentGame;
-        console.log(objectOfTop);
+        // console.log(objectOfTop);
         localStorage.removeItem("vetaniExistGamePuzzleTopGames");
         localStorage.setItem("vetaniExistGamePuzzleTopGames", JSON.stringify(objectOfTop));
       } else {
         for (let i = 0; i < 10; i += 1) {
-          if (gamePuzzleCurrentGame.score > top[i]){
+          if (gamePuzzleCurrentGame.score > top[i]) {
             top[i] = gamePuzzleCurrentGame;
             break;
           }
         }
         localStorage.removeItem("vetaniExistGamePuzzleTopGames");
         localStorage.setItem("vetaniExistGamePuzzleTopGames", JSON.stringify(top));
+        GamePuzzle.bubleSortTop();
       }
 
-      //console.log(tmpKeys.length);
+      // console.log(tmpKeys.length);
     } else {
       const objectOfTop = {
         0: gamePuzzleCurrentGame,
       };
 
       localStorage.setItem("vetaniExistGamePuzzleTopGames", JSON.stringify(objectOfTop));
-      console.log("dont get");
+      // console.log("dont get");
     }
   }
 
-  bubleSortTop() {
+  static bubleSortTop() {
     const top = JSON.parse(localStorage.getItem("vetaniExistGamePuzzleTopGames"));
     const topKeys = Object.keys(top);
     for (let i = 0; i < topKeys; i += 1) {
-      for (let j = 0; j < topKeys;j += 1) {
+      for (let j = 0; j < topKeys; j += 1) {
         if (top[j].score > top[i].score) {
           const tmp = top[i];
           top[i] = top[j];
@@ -413,7 +415,7 @@ export class GamePuzzle {
       }
     }
     localStorage.removeItem("vetaniExistGamePuzzleTopGames");
-    localStorage.setItem("vetaniExistGamePuzzleTopGames", JSON.stringify(objectOfTop));
+    localStorage.setItem("vetaniExistGamePuzzleTopGames", JSON.stringify(top));
   }
 
   loadGame() {
@@ -546,7 +548,6 @@ export class GamePuzzle {
 
       this.getSolvePath(currentMinState);
     }, 25);
-
   }
 
   static checkInVisitedArray(visited, field) {
@@ -683,10 +684,9 @@ export class GamePuzzle {
           this.playAudio();
           this.stepCounter += 1;
           this.updateTime();
-          console.log(cellSize);
+          // console.log(cellSize);
         } else {
           steps = [];
-          return;
         }
       }, i * cellSize + 300 * i);
     }
@@ -739,7 +739,7 @@ export class GamePuzzle {
 
     this.score = this.size * 10000 - this.stepCounter * minuteScore * secondsScore;
     if (this.score < 0) {
-      console.log("this.score");
+      // console.log("this.score");
       this.score = 1;
     }
     return this.score;

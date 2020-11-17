@@ -142,7 +142,7 @@ export class MyCanvas {
     context.fillRect(0, 0, 480, 480);
     context.fillStyle = "white";
     context.fillText("You win!!! Step Count:".concat(step), 0, 120);
-    context.fillText("Score: " + score, 0, 150);
+    context.fillText(`Score: ${score}`, 0, 150);
     context.font = "24px Verdana";
     context.fillText(time, 0, 250);
   }
